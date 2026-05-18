@@ -1,0 +1,2 @@
+import{c as n,a}from"../chunks/k10iJQHi.js";import{ah as s}from"../chunks/DK3STNT6.js";import{s as p}from"../chunks/BuxeKLAG.js";const c=!0,i=()=>({}),d=Object.freeze(Object.defineProperty({__proto__:null,load:i,prerender:c},Symbol.toStringTag,{value:"Module"}));function f(o,r){var e=n(),t=s(e);p(t,()=>r.children),a(o,e)}export{f as component,d as universal};
+//# sourceMappingURL=0.CQS4eI1I.js.map
