@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gfork.secbit.io/api/sitemap
+Sitemap: https://home.greasyfork.org.cn/sitemap.xml
