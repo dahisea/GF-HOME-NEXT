@@ -1,2 +1,0 @@
-# GF-HOME-NEXT
-
