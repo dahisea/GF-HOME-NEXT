@@ -34,7 +34,7 @@ jobs:
       - name: Prepare cdn deploy
         run: |
           mkdir -p /tmp/cdn_deploy
-          cp -r build/_app /tmp/cdn_deploy/_app
+          cp -r build/_app /tmp/cdn_deploy/gfork/_app
 
       - name: Deploy _app/ to cdn branch
         uses: peaceiris/actions-gh-pages@v4
