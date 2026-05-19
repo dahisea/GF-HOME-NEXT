@@ -33,7 +33,7 @@ jobs:
 
       - name: Prepare cdn deploy
         run: |
-          mkdir -p /tmp/cdn_deploy
+          mkdir -p /tmp/cdn_deploy/gfork
           cp -r build/_app /tmp/cdn_deploy/gfork/_app
 
       - name: Deploy _app/ to cdn branch
