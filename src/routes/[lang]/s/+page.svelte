@@ -7,7 +7,7 @@
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	let targetUrl = $state(`/${lang}/lookup/`);
+	let targetUrl = $state(`/${lang}/lookup`);
 	let countdown = $state(siteConfig.redirects.searchDelaySec);
 	let waitText = $derived(t(lang, 'redirect.waiting').replace('{countdown}', String(countdown)));
 
@@ -24,7 +24,7 @@
 		for (const [k, v] of hashParams) { if (v) merged.set(k, v); }
 
 		const qs = merged.toString();
-		if (qs) targetUrl = `/${lang}/lookup/#?${qs}`;
+		if (qs) targetUrl = `/${lang}/lookup#?${qs}`;
 
 		const w = window as unknown as Record<string, unknown>;
 		const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];

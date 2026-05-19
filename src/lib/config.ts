@@ -4,7 +4,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import type { Lang } from '$i18n';
-import { cdnEnabled } from './cdn-toggle';
+import { cdnEnabled, cdnStatic, buildBasePath } from './cdn-toggle';
 
 // ─── 类型定义 ────────────────────────────────────────────────────────────
 
@@ -150,12 +150,12 @@ export const siteConfig = {
   //  编辑 src/lib/cdn-toggle.ts 以启用/禁用 CDN 源站改写。
   cdn: {
     get enabled() { return cdnEnabled; },
-    static:  'https://web-static-origin.dahi.edu.cn.dahi.e.yu.ac.cn',
+    static: cdnStatic,
     siteProxy: 'https://gfork.zh-tw.eu.org',
     adsenseScript: 'https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js',
     /** 构建 /_app 资源的部署基础路径，例如 '/app' 或 ''。
      *  若将 build/_app 镜像至 https://a.com/app/_app/，则设为 '/app'。 */
-    buildBasePath: '/gfork',
+    buildBasePath,
   } satisfies CdnConfig,
 
   // ─── 下载测速节点 ──────────────────────────────────────────────────

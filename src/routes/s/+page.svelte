@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
 
-	let targetUrl = $state('/en/lookup/');
+	let targetUrl = $state('/en/lookup');
 	let countdown = $state(siteConfig.redirects.searchDelaySec);
 
 	onMount(() => {
@@ -19,7 +19,7 @@
 		for (const [k, v] of hashParams) { if (v) merged.set(k, v); }
 
 		const qs = merged.toString();
-		if (qs) targetUrl = '/en/lookup/#?' + qs;
+		if (qs) targetUrl = '/en/lookup#?' + qs;
 
 		// Push ads
 		const w = window as unknown as Record<string, unknown>;

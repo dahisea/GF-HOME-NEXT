@@ -1,5 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { cdnEnabled, cdnStatic, buildBasePath } from './src/lib/cdn-toggle.ts';
 
 const allLangs = ['zh-hans', 'zh-hant', 'en', 'ja'];
 const pages = ['', '/download', '/lookup', '/search', '/help', '/about', '/tos', '/feedback', '/applist', '/installing', '/info'];
@@ -29,10 +30,10 @@ const config = {
 			handleUnseenRoutes: 'ignore'
 		},
 		paths: {
-			// Override via VITE_BUILD_BASE_PATH env var for CDN _app mirroring.
-			// e.g. VITE_BUILD_BASE_PATH=/app makes _app → /app/_app.
-			// Leave empty for root deployment.
-			base: process.env.VITE_BUILD_BASE_PATH || ''
+			base: process.env.VITE_BUILD_BASE_PATH || '',
+			assets: cdnEnabled
+				? `${cdnStatic}${buildBasePath}`
+				: (process.env.VITE_BUILD_BASE_PATH || '')
 		},
 		alias: {
 			$components: 'src/lib/components',

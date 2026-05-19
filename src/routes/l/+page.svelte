@@ -2,13 +2,13 @@
 	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
 
-	let targetUrl = $state('/en/download/');
+	let targetUrl = $state('/en/download');
 	let countdown = $state(siteConfig.redirects.downloadDelaySec);
 
 	onMount(() => {
 		const hash = window.location.hash;
 		if (hash && hash.startsWith('#/')) {
-			targetUrl = window.location.origin + '/en/download/' + hash;
+			targetUrl = window.location.origin + '/en/download' + hash;
 		}
 
 		// Push ads

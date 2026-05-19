@@ -7,14 +7,14 @@
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	let targetUrl = $state(`/${lang}/download/`);
+	let targetUrl = $state(`/${lang}/download`);
 	let countdown = $state(siteConfig.redirects.downloadDelaySec);
 	let waitText = $derived(t(lang, 'redirect.waiting').replace('{countdown}', String(countdown)));
 
 	onMount(() => {
 		const hash = window.location.hash;
 		if (hash && hash.startsWith('#/')) {
-			targetUrl = window.location.origin + `/${lang}/download/` + hash;
+			targetUrl = window.location.origin + `/${lang}/download` + hash;
 		}
 
 		const w = window as unknown as Record<string, unknown>;
