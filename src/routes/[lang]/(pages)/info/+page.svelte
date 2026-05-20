@@ -44,8 +44,9 @@
 		for (const { regex, pageType } of patterns) {
 			const m = path.match(regex);
 			if (m) {
+				const locale = m[1].replace('zh-hans', 'zh-CN').replace('zh-hant', 'zh-TW');
 				return {
-					locale: m[1],
+					locale,
 					scriptId: pageType !== 'users' ? m[2] : null,
 					userId: pageType === 'users' ? m[2] : null,
 					pageType,
