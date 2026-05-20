@@ -126,6 +126,9 @@
 	// feedback
 	let feedbackTitle = $state('');
 	let feedbackListHtml = $state('');
+		let feedbackPage = $state(1);
+		let feedbackTotalPages = $state(1);
+		let feedbackLoading = $state(false);
 
 	// users
 	interface GithubIdentity { name: string; url?: string }
@@ -162,6 +165,9 @@
 				if (!a.hasAttribute('target')) a.setAttribute('target', '_blank');
 				return;
 			}
+
+			// Skip internal app links (e.g., /zh-hans/installing)
+			if (/^\/(zh-hans|zh-hant|en|ja|zh-CN|zh-TW)\//.test(href)) return;
 
 			// All other relative links → proxy
 			const proxy = siteProxyUrl();
@@ -241,24 +247,43 @@
 		document.title = scriptTitle ? `${scriptTitle} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
 	}
 
-	async function loadFeedbackPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
+		async function loadFeedbackPage(r: RouteInfo, signal: AbortSignal, page = 1): Promise<void> {
 		activeTab = 'feedback';
-		const url = `${INFO_API}/${r.locale}/scripts/${r.scriptId}/feedback.json`;
+			const url = `${INFO_API}/${r.locale}/scripts/${r.scriptId}/feedback.json?page=${page}`;
 		const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		feedbackTitle = json.title || '';
-		feedbackListHtml = decodeBase64(json.c1) || `<p style="text-align:center;color:var(--md-sys-color-on-surface-variant);padding:40px">${t(lang, 'info.no_feedback')}</p>`;
+			feedbackPage = json.page || 1;
+			feedbackTotalPages = json.totalPages || 1;
+			feedbackListHtml = decodeBase64(json.c1) || `<p style="text-align:center;color:var(--md-sys-color-on-surface-variant);padding:40px">${t(lang, 'info.no_feedback')}</p>`;
 		document.title = feedbackTitle ? `${feedbackTitle} - ${t(lang, 'info.feedback_tab')}` : t(lang, 'info.feedback_tab');
 	}
+
+		async function goToFeedbackPage(page: number): Promise<void> {
+			if (!route || page < 1 || page > feedbackTotalPages || feedbackLoading) return;
+			feedbackLoading = true;
+			try {
+				abortController?.abort();
+				abortController = new AbortController();
+				await loadFeedbackPage(route, abortController.signal, page);
+				document.getElementById('feedback-list')?.scrollIntoView({ behavior: 'smooth' });
+			} catch (e) {
+				if ((e as Error).name !== 'AbortError') {
+					error = `${t(lang, 'info.generic_error')}: ${(e as Error).message || ''}`;
+				}
+			} finally {
+				feedbackLoading = false;
+			}
+		}
 
 	async function loadUserPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
 		const url = `${INFO_API}/${r.locale}/users/${r.userId}.json`;
 		const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
-		userData = json;
-		document.title = json.name ? `${json.name} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
+		userData = json.user && typeof json.user === 'object' && json.user.name ? json.user : json;
+		document.title = userData.name ? `${userData.name} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
 	}
 
 	// ─── Lifecycle ──────────────────────────────────────────────────────
@@ -499,12 +524,12 @@
 
 					<!-- Script meta block (from API c2) -->
 					{#if scriptMetaHtml}
-						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={lang}>{@html scriptMetaHtml}</div>
+						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={route.locale}>{@html scriptMetaHtml}</div>
 					{/if}
 
 					<!-- Additional info (from API c3) -->
 					{#if additionalInfoHtml}
-						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={lang}>{@html additionalInfoHtml}</div>
+						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={route.locale}>{@html additionalInfoHtml}</div>
 					{/if}
 
 					{#if !scriptMetaHtml && !additionalInfoHtml}
@@ -515,7 +540,24 @@
 				{:else}
 					<!-- Feedback Tab -->
 					{#if feedbackListHtml}
-						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={lang}>{@html feedbackListHtml}</div>
+						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={route.locale}>{@html feedbackListHtml}</div>
+					{#if feedbackTotalPages > 1}
+						<nav class="if-pagination">
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} onclick={() => goToFeedbackPage(1)}>
+								{t(lang, 'lookup.pagination.first')}
+							</button>
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} onclick={() => goToFeedbackPage(feedbackPage - 1)}>
+								{t(lang, 'lookup.pagination.prev')}
+							</button>
+							<span class="if-page-indicator">{feedbackPage} / {feedbackTotalPages}</span>
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === feedbackTotalPages} onclick={() => goToFeedbackPage(feedbackPage + 1)}>
+								{t(lang, 'lookup.pagination.next')}
+							</button>
+							{#if feedbackLoading}
+								<span class="material-icons if-spinner-sm">autorenew</span>
+							{/if}
+						</nav>
+					{/if}
 					{/if}
 				{/if}
 			</section>
@@ -946,4 +988,21 @@
 
 	@keyframes if-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 	@keyframes if-fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+	/* ── Pagination ─────────────────────────────────── */
+	.if-pagination {
+		display: flex; align-items: center; justify-content: center; gap: 12px;
+		margin-top: 16px; padding: 8px 0;
+	}
+	.if-page-btn {
+		min-width: auto; padding: 6px 14px; font-size: 13px;
+	}
+	.if-page-indicator {
+		font-size: 14px; font-weight: 500;
+		color: var(--md-sys-color-on-surface);
+	}
+	.if-spinner-sm {
+		font-size: 18px; animation: if-spin 1s linear infinite;
+		color: var(--md-sys-color-primary);
+	}
 </style>

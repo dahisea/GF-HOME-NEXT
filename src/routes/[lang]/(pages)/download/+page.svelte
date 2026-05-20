@@ -230,6 +230,7 @@
 <svelte:head>
 	<title>{t(lang, 'download.title')} - {t(lang, 'site.name')}</title>
 	<meta name="description" content={t(lang, 'download.description')} />
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </svelte:head>
 
 <section class="download-page">

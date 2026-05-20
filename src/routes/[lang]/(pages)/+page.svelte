@@ -62,7 +62,7 @@
 <div class="width-constraint" use:observeSections>
 	<!-- Hero Search Section -->
 	<section class="page-section--centered" style="margin-top:48px;margin-bottom:32px">
-		<h2 class="headline-medium" style="margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
+		<h2 class="headline-medium" style="text-align:center;margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
 		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" style="display:flex;justify-content:center">
 			<div class="md3-search-bar" style="max-width:560px">
 				<input type="search" name="q" placeholder={t(lang, 'search.placeholder')} required />
@@ -85,7 +85,7 @@
 
 	<!-- Intro Section -->
 	<section class="text-content" style="text-align:center">
-		<img src={staticUrl('/gfork/img/gforkg.svg')} alt="site-logo" loading="lazy" style="height:180px;user-select:none;pointer-events:none" />
+		<img src="/img/gforkg.svg" alt="site-logo" loading="lazy" style="height:180px;user-select:none;pointer-events:none" />
 		<p style="margin-top:16px;color:var(--md-sys-color-on-surface-variant)">{t(lang, 'home.intro')}</p>
 	</section>
 
@@ -110,10 +110,10 @@
 	<!-- URL Tool Section -->
 	<section class="text-content" style="text-align:center">
 		<p style="margin-bottom:12px;font-weight:500">{t(lang, 'home.url_tool.title')}</p>
-		<div style="display:flex;gap:8px;max-width:560px;margin:0 auto 16px">
+		<div style="display:flex;flex-direction:column;gap:8px;max-width:560px;margin:0 auto 16px">
 			<input type="search" id="inputUrl" bind:value={inputUrl} placeholder={t(lang, 'home.url_tool.placeholder')}
-				style="flex:1;padding:10px 16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-full);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);outline:none;color:var(--md-sys-color-on-surface)" />
-			<button onclick={replaceUrl} class="md3-button md3-ripple" style="flex-shrink:0">{t(lang, 'home.url_tool.button')}</button>
+				style="padding:10px 16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-full);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);outline:none;color:var(--md-sys-color-on-surface)" />
+			<button onclick={replaceUrl} class="md3-button md3-ripple">{t(lang, 'home.url_tool.button')}</button>
 		</div>
 		<p class="text-gf-muted">{t(lang, 'home.url_tool.result')}</p>
 		{#if outputUrl}
