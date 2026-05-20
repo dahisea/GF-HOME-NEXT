@@ -9,7 +9,6 @@
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	// 从 config 获取 Lookup API 节点列表
 	const PRIMARY_NODES = getPrimaryLookupNodes();
 	const BACKUP_NODES = getBackupLookupNodes();
 
@@ -17,7 +16,6 @@
 
 	function nodeName(n: ApiNode): string { return `NODE_${n.id}`; }
 
-	// Hash 参数解析（与旧项目一致）
 	interface SearchParams {
 		q?: string;
 		site?: string;
@@ -90,7 +88,6 @@
 		window.history.pushState({}, '', url);
 	}
 
-	// 脚本结果接口定义
 	interface ScriptResult {
 		id: number;
 		name: string;
@@ -120,7 +117,6 @@
 	let responseNode = $state('');
 	let abortController: AbortController | null = $state(null);
 
-	// SHA-256 签名生成
 	async function generateSS(): Promise<string> {
 		const timestamp = Math.floor(Date.now() / 1000).toString();
 		const input = timestamp.substring(0, 8);
@@ -130,7 +126,6 @@
 		return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('').substring(0, siteConfig.lookupSignature.ssLength);
 	}
 
-	// API 请求函数（单节点带超时）
 	async function fetchFromNode(
 		node: ApiNode,
 		signal: AbortSignal,
@@ -216,11 +211,10 @@
 		});
 	}
 
-	// 主搜索流程 — 先主节点，失败后尝试备节点
 	async function doSearch(): Promise<void> {
 		const params = getSearchParams();
 		if (!params.q && !params.site && !params.page) {
-			error = '警告: 当前未搜索任何内容';
+			error = t(lang, 'lookup.no_search_content');
 			return;
 		}
 
@@ -232,7 +226,6 @@
 		error = '';
 		responseNode = '';
 
-		// 尝试主节点
 		const primaryResult = await raceNodes(PRIMARY_NODES, signal);
 		if (primaryResult.success && primaryResult.data) {
 			responseNode = primaryResult.node ? nodeName(primaryResult.node) : '';
@@ -240,13 +233,12 @@
 			return;
 		}
 
-		// 尝试备用节点
 		const backupResult = await raceNodes(BACKUP_NODES, signal);
 		if (backupResult.success && backupResult.data) {
 			responseNode = backupResult.node ? nodeName(backupResult.node) : '';
 			handleResults(backupResult.data);
 		} else {
-			error = backupResult.message || '所有 API 请求失败，请检查网络连接或稍后重试';
+			error = backupResult.message || 'All API requests failed';
 			loading = false;
 		}
 	}
@@ -254,7 +246,7 @@
 	function handleResults(data: ScriptResult[]): void {
 		if ((data as unknown as { redirect?: boolean; target_url?: string; message?: string }).redirect) {
 			const r = data as unknown as { target_url: string; message: string };
-			alert(r.message || '检测到非中文区域，将跳转到 Greasyfork Official Site');
+			alert(r.message || 'Redirecting to Greasyfork Official Site');
 			window.location.href = r.target_url;
 			return;
 		}
@@ -262,7 +254,6 @@
 		if (Array.isArray(data)) {
 			results = data;
 
-			// Audit: search event
 			if (siteConfig.audit.enabled) {
 				const sp = getSearchParams();
 				sendAudit('search', {
@@ -284,7 +275,6 @@
 		loading = false;
 	}
 
-	// 从 Hash 同步到 UI 控件
 	function syncFromHash(): SearchParams {
 		const p = getSearchParams();
 		query = p.q || '';
@@ -349,11 +339,11 @@
 		window.open(window.location.href, '_blank');
 	}
 
-	// 工具函数
 	function formatDateTime(raw: string): string {
-		if (!raw) return '未知';
+		if (!raw) return '—';
 		const d = new Date(raw);
-		return d.toLocaleString('zh-CN', {
+		const locale = i18nConfig.langNames[lang];
+		return d.toLocaleString(locale, {
 			year: 'numeric', month: '2-digit', day: '2-digit',
 			hour: '2-digit', minute: '2-digit', hour12: false
 		}).replace(/\//g, '-');
@@ -385,7 +375,49 @@
 		return `/${lang}/info#/${locale}/users/${userId}`;
 	}
 
-	// ─── 生命周期 ──────────────────────────────────────────────────────
+	// ─── Sort / filter option definitions (keys resolved at render time) ───
+	const sortOptions: { value: string; key: string }[] = [
+		{ value: '', key: 'lookup.sort_relevance' },
+		{ value: 'daily_installs', key: 'lookup.sort_daily_installs' },
+		{ value: 'total_installs', key: 'lookup.sort_total_installs' },
+		{ value: 'ratings', key: 'lookup.sort_ratings' },
+		{ value: 'created', key: 'lookup.sort_created' },
+		{ value: 'updated', key: 'lookup.sort_updated' },
+		{ value: 'name', key: 'lookup.sort_name' }
+	];
+
+	const numericFilters: { key: string; labelKey: string; type: string; step?: string }[] = [
+		{ key: 'total_installs', labelKey: 'lookup.total_installs', type: 'number' },
+		{ key: 'daily_installs', labelKey: 'lookup.daily_installs', type: 'number' },
+		{ key: 'ratings', labelKey: 'lookup.ratings', type: 'number', step: '0.1' }
+	];
+
+	const dateFilters: { key: string; labelKey: string }[] = [
+		{ key: 'created', labelKey: 'lookup.created' },
+		{ key: 'updated', labelKey: 'lookup.updated' }
+	];
+
+	const localeOptions = [
+		{ value: '187', label: '简体中文 (zh-CN)' },
+		{ value: '188', label: '繁體中文 (zh-TW)' },
+		{ value: '40', label: 'English (en)' },
+		{ value: '78', label: '日本語 (ja)' },
+		{ value: '88', label: '한국어 (ko)' },
+		{ value: '42', label: 'Español (es)' },
+		{ value: '51', label: 'Français (fr)' },
+		{ value: '35', label: 'Deutsch (de)' },
+		{ value: '139', label: 'Русский (ru)' },
+		{ value: '134', label: 'Português do Brasil (pt-BR)' },
+		{ value: '76', label: 'Italiano (it)' },
+		{ value: '118', label: 'Nederlands (nl)' },
+		{ value: '130', label: 'Polski (pl)' },
+		{ value: '171', label: 'Türkçe (tr)' },
+		{ value: '181', label: 'Tiếng Việt (vi)' },
+		{ value: '165', label: 'ไทย (th)' },
+		{ value: '71', label: 'Bahasa Indonesia (id)' }
+	];
+
+	// ─── Lifecycle ──────────────────────────────────────────────────
 	let popstateTimer: ReturnType<typeof setTimeout>;
 	let initialChecked = $state(false);
 
@@ -411,18 +443,16 @@
 		};
 		window.addEventListener('popstate', debouncedPop);
 
-		// visibility 变化时 abort 请求
 		document.addEventListener('visibilitychange', () => {
 			if (document.hidden && abortController) abortController.abort();
 		});
 
-		// 初始加载
 		initialChecked = true;
 		const params = syncFromHash();
 		if (params.q || params.site || params.page) {
 			doSearch();
 		} else {
-			error = '警告: 当前未搜索任何内容';
+			error = t(lang, 'lookup.no_search_content');
 		}
 
 		return () => {
@@ -430,37 +460,6 @@
 			window.removeEventListener('popstate', debouncedPop);
 		};
 	});
-
-	// 排序选项
-	const sortOptions = [
-		{ value: '', label: '相关程度' },
-		{ value: 'daily_installs', label: '日安装量' },
-		{ value: 'total_installs', label: '总安装量' },
-		{ value: 'ratings', label: '得分' },
-		{ value: 'created', label: '创建日期' },
-		{ value: 'updated', label: '更新日期' },
-		{ value: 'name', label: '名称' }
-	];
-
-	const localeOptions = [
-		{ value: '187', label: '简体中文 (zh-CN)' },
-		{ value: '188', label: '繁體中文 (zh-TW)' },
-		{ value: '40', label: 'English (en)' },
-		{ value: '78', label: '日本語 (ja)' },
-		{ value: '88', label: '한국어 (ko)' },
-		{ value: '42', label: 'Español (es)' },
-		{ value: '51', label: 'Français (fr)' },
-		{ value: '35', label: 'Deutsch (de)' },
-		{ value: '139', label: 'Русский (ru)' },
-		{ value: '134', label: 'Português do Brasil (pt-BR)' },
-		{ value: '76', label: 'Italiano (it)' },
-		{ value: '118', label: 'Nederlands (nl)' },
-		{ value: '130', label: 'Polski (pl)' },
-		{ value: '171', label: 'Türkçe (tr)' },
-		{ value: '181', label: 'Tiếng Việt (vi)' },
-		{ value: '165', label: 'ไทย (th)' },
-		{ value: '71', label: 'Bahasa Indonesia (id)' }
-	];
 </script>
 
 <svelte:head>
@@ -470,35 +469,138 @@
 </svelte:head>
 
 <section class="lk-page">
-	<!-- 移动端侧边栏切换按钮 -->
 	<button class="lk-sidebar-toggle" class:open={sidebarOpen} onclick={() => (sidebarOpen = !sidebarOpen)}>
 		{sidebarOpen ? '✕' : '☰'}
 	</button>
 
 	<div class="width-constraint">
 		<div class="lk-layout" class:sidebar-open={sidebarOpen}>
-			<!-- 主内容区 -->
+			<!-- Sidebar — first in DOM for higher rendering priority -->
+			<aside class="lk-sidebar" class:open={sidebarOpen}>
+				<div class="lk-sidebar-title">{t(lang, 'lookup.sidebar_title')}</div>
+
+				<form class="lk-sidebar-search" onsubmit={handleSearch}>
+					<input
+						type="search"
+						name="q"
+						bind:value={query}
+						placeholder={t(lang, 'lookup.sidebar_search')}
+						fetchpriority="high"
+					/>
+					<button type="submit" class="search-icon-btn" aria-label={t(lang, 'lookup.sidebar_search')}>
+						<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+						</svg>
+					</button>
+				</form>
+
+				<!-- Sort options -->
+				<div class="lk-option-group">
+					<div class="lk-option-label">{t(lang, 'lookup.sidebar_sort')}</div>
+					<div class="lk-chip-row">
+						{#each sortOptions as opt}
+							<button
+								class="md3-chip"
+								class:md3-chip--selected={sortBy === opt.value}
+								onclick={e => { e.preventDefault(); handleSort(opt.value); }}
+							>
+								{t(lang, opt.key)}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Language filter -->
+				<div class="lk-option-group">
+					<div class="lk-option-label">{t(lang, 'lookup.sidebar_lang')}</div>
+					<div class="lk-chip-row">
+						<button class="md3-chip" class:md3-chip--selected={filterLocale === '0'} onclick={e => { e.preventDefault(); handleLangFilter('0'); }}>
+							{t(lang, 'lookup.lang_all')}
+						</button>
+						<button class="md3-chip" class:md3-chip--selected={filterLocale === '1'} onclick={e => { e.preventDefault(); handleLangFilter('1'); }}>
+							{t(lang, 'lookup.lang_zh')}
+						</button>
+					</div>
+				</div>
+
+				<!-- Advanced filters -->
+				<div class="lk-option-group">
+					<details>
+						<summary class="lk-advanced-summary">{t(lang, 'lookup.sidebar_advanced')}</summary>
+						<form class="lk-advanced-form" onsubmit={applyFilter}>
+							<div class="lk-filter-group">
+								<input name="site" placeholder={t(lang, 'lookup.filter_site_placeholder')} />
+							</div>
+
+							{#each numericFilters as filter}
+								<div class="lk-filter-group">
+									<label for="{filter.key}_operator">{t(lang, filter.labelKey)}:</label>
+									<div class="lk-filter-row">
+										<select id="{filter.key}_operator" name="{filter.key}_operator">
+											<option value="gt">{t(lang, 'lookup.operator.gt')}</option>
+											<option value="lt">{t(lang, 'lookup.operator.lt')}</option>
+											<option value="eq">{t(lang, 'lookup.operator.eq')}</option>
+										</select>
+										<input type={filter.type} name={filter.key} placeholder={t(lang, 'lookup.filter_value_placeholder')} step={filter.step || ''} />
+									</div>
+								</div>
+							{/each}
+
+							{#each dateFilters as filter}
+								<div class="lk-filter-group">
+									<label for="{filter.key}_operator">{t(lang, filter.labelKey)}:</label>
+									<div class="lk-filter-row">
+										<select id="{filter.key}_operator" name="{filter.key}_operator">
+											<option value="gt">{t(lang, 'lookup.operator.after')}</option>
+											<option value="lt">{t(lang, 'lookup.operator.before')}</option>
+										</select>
+										<input type="datetime-local" name={filter.key} />
+									</div>
+								</div>
+							{/each}
+
+							<div class="lk-filter-group">
+								<label for="entry_locales">{t(lang, 'lookup.filter_script_lang')}:</label>
+								<select name="entry_locales[]" multiple size="5" id="entry_locales">
+									{#each localeOptions as loc}
+										<option value={loc.value}>{loc.label}</option>
+									{/each}
+								</select>
+								<small class="lk-filter-hint">{t(lang, 'lookup.filter_multi_hint')}</small>
+							</div>
+
+							<input type="hidden" name="tz" value={Intl.DateTimeFormat().resolvedOptions().timeZone} />
+
+							<div class="lk-filter-actions">
+								<button type="submit" class="md3-button lk-filter-btn">{t(lang, 'lookup.filter_apply')}</button>
+								<button type="button" class="md3-outlined-button lk-filter-btn" onclick={clearFilters}>{t(lang, 'lookup.filter_clear')}</button>
+							</div>
+						</form>
+					</details>
+				</div>
+			</aside>
+
+			<!-- Main content -->
 			<div class="lk-main">
-				<!-- 加载中 -->
 				{#if loading}
-					<div class="md3-card lk-center-box" style="min-height:400px">
-						<span class="material-icons" style="font-size:48px;animation:lk-spin 1s linear infinite;display:inline-block;color:var(--md-sys-color-primary)">autorenew</span>
+					<div class="md3-card lk-center-box">
+						<span class="material-icons lk-spinner">autorenew</span>
 						<div class="lk-loading-tip">
-							少女祈祷中…正等待加载脚本。<br />
-							<small>注意：所有结果均来源于网络搜索，可靠性未知，请注意甄别代码以及相关内容，谨防欺诈。</small>
+							{t(lang, 'lookup.loading')}<br />
+							<small>{t(lang, 'lookup.warning')}</small>
 						</div>
 					</div>
 				{:else if error}
 					<div class="md3-card lk-center-box">
-						<h3 class="title-large" style="margin-bottom:12px">加载失败</h3>
+						<h3 class="title-large" style="margin-bottom:12px">{t(lang, 'lookup.load_failed')}</h3>
 						<p style="color:var(--md-sys-color-on-surface-variant)">{error}</p>
 						{#if !query}
-							<p style="margin-top:16px;color:var(--md-sys-color-on-surface-variant)">请通过正确的搜索入口访问本页面</p>
+							<p style="margin-top:16px;color:var(--md-sys-color-on-surface-variant)">{t(lang, 'lookup.search_prompt')}</p>
 						{/if}
 					</div>
 				{:else if results.length === 0 && query}
 					<div class="md3-card lk-center-box">
-						<p style="color:var(--md-sys-color-on-surface-variant)">未找到匹配内容</p>
+						<p style="color:var(--md-sys-color-on-surface-variant)">{t(lang, 'lookup.no_results')}</p>
 					</div>
 				{:else if results.length > 0}
 					<ol class="lk-script-list">
@@ -507,34 +609,34 @@
 								<article>
 									<h2>
 										<a class="lk-script-link" href={getScriptInfoUrl(script)} target="_blank" rel="noopener noreferrer">
-											{script.name || '未命名'}
+											{script.name || t(lang, 'lookup.unnamed')}
 										</a>
-										<span class="lk-badge-js" title="用户脚本">JS</span>
+										<span class="lk-badge-js" title="User Script">JS</span>
 										<span class="lk-sep">-</span>
-										<span class="lk-script-desc">{escapeHtml(script.description || '暂无描述')}</span>
+										<span class="lk-script-desc">{escapeHtml(script.description || t(lang, 'lookup.no_description'))}</span>
 									</h2>
 									<div class="lk-script-meta">
 										<dl class="lk-stats">
-											<dt>作者</dt>
-											<dd><a href={getAuthorUrl(script)} target="_blank" rel="noopener noreferrer">{escapeHtml(script.users?.[0]?.name || '未知作者')}</a></dd>
-											<dt>日安装量</dt>
+											<dt>{t(lang, 'lookup.author')}</dt>
+											<dd><a href={getAuthorUrl(script)} target="_blank" rel="noopener noreferrer">{escapeHtml(script.users?.[0]?.name || t(lang, 'lookup.unknown_author'))}</a></dd>
+											<dt>{t(lang, 'lookup.daily_installs')}</dt>
 											<dd>{script.daily_installs || 0}</dd>
-											<dt>总安装量</dt>
+											<dt>{t(lang, 'lookup.total_installs')}</dt>
 											<dd>{script.total_installs || 0}</dd>
-											<dt>评分</dt>
+											<dt>{t(lang, 'lookup.ratings')}</dt>
 											<dd class="lk-ratings-cell" data-rating-score={script.fan_score || 0}>
-												<span class="lk-good" title="评级为好评或已加入到收藏的人数">{script.good_ratings || 0}</span>
-												<span class="lk-ok" title="评级为一般的人数">{script.ok_ratings || 0}</span>
-												<span class="lk-bad" title="评级为差评的人数">{script.bad_ratings || 0}</span>
+												<span class="lk-good" title={t(lang, 'lookup.ratings_good')}>{script.good_ratings || 0}</span>
+												<span class="lk-ok" title={t(lang, 'lookup.ratings_ok')}>{script.ok_ratings || 0}</span>
+												<span class="lk-bad" title={t(lang, 'lookup.ratings_bad')}>{script.bad_ratings || 0}</span>
 											</dd>
-											<dt>创建于</dt>
+											<dt>{t(lang, 'lookup.created')}</dt>
 											<dd>{formatDateTime(script.created_at)}</dd>
-											<dt>更新于</dt>
+											<dt>{t(lang, 'lookup.updated')}</dt>
 											<dd>{formatDateTime(script.code_updated_at)}</dd>
 										</dl>
 										<div class="lk-install-area">
 											<a href={getDownloadUrl(script)} class="md3-button" target="_blank" rel="noopener noreferrer">
-												立即安装此脚本
+												{t(lang, 'lookup.install')}
 											</a>
 										</div>
 									</div>
@@ -542,126 +644,19 @@
 							</li>
 						{/each}
 					</ol>
-					<!-- 分页 -->
+
+					<!-- Pagination -->
 					{@const pageNum = parseInt(currentPage) || 1}
 					<div class="lk-pagination">
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: '1' }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">回到第一页</a>
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(Math.max(pageNum - 1, 1)) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">上一页</a>
+						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: '1' }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.first')}</a>
+						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(Math.max(pageNum - 1, 1)) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.prev')}</a>
 						<span class="lk-current-page">{pageNum}</span>
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(pageNum + 1) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={results.length < 25} style="opacity:{results.length < 25 ? '0.4' : '1'}">下一页</a>
+						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(pageNum + 1) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={results.length < 25} style="opacity:{results.length < 25 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.next')}</a>
 					</div>
 				{/if}
 
-				<!-- 警告栏 -->
 				<div class="lk-warning-bar">
-					注意：所有结果均来源于网络搜索，可靠性未知，请注意甄别代码以及相关内容，谨防欺诈。
-				</div>
-			</div>
-
-			<!-- 侧边栏 -->
-			<div class="lk-sidebar" class:open={sidebarOpen}>
-				<div class="lk-sidebar-title">搜索选项</div>
-
-				<!-- 搜索框 -->
-				<form class="lk-sidebar-search" onsubmit={handleSearch}>
-					<input type="search" name="q" bind:value={query} placeholder="搜索脚本..." />
-					<button type="submit" class="search-icon-btn" aria-label="搜索">
-					<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-					</svg>
-				</button>
-				</form>
-
-				<!-- 排序方式 -->
-				<div class="lk-option-group">
-					<div style="font-size:13px;font-weight:600;color:var(--md-sys-color-on-surface);margin-bottom:8px">排序方式</div>
-					<div style="display:flex;flex-wrap:wrap;gap:6px">
-						{#each sortOptions as opt}
-							<button
-								class="md3-chip"
-								class:md3-chip--selected={sortBy === opt.value}
-								onclick={e => { e.preventDefault(); handleSort(opt.value); }}
-							>
-								{opt.label}
-							</button>
-						{/each}
-					</div>
-				</div>
-
-				<!-- 语言筛选 -->
-				<div class="lk-option-group">
-					<div style="font-size:13px;font-weight:600;color:var(--md-sys-color-on-surface);margin-bottom:8px">语言筛选</div>
-					<div style="display:flex;flex-wrap:wrap;gap:6px">
-						<button class="md3-chip" class:md3-chip--selected={filterLocale === '0'} onclick={e => { e.preventDefault(); handleLangFilter('0'); }}>
-							展示所有语言内容
-						</button>
-						<button class="md3-chip" class:md3-chip--selected={filterLocale === '1'} onclick={e => { e.preventDefault(); handleLangFilter('1'); }}>
-							仅展示中文内容
-						</button>
-					</div>
-				</div>
-
-				<!-- 高级筛选 -->
-				<div class="lk-option-group">
-					<details style="margin-top:8px">
-						<summary style="font-size:13px;font-weight:600;color:var(--md-sys-color-on-surface);cursor:pointer;margin-bottom:12px">高级筛选选项</summary>
-						<form class="lk-advanced-form" onsubmit={applyFilter}>
-							<div class="lk-filter-group">
-								<input name="site" placeholder="网站域名过滤（如：bilibili.com）" />
-							</div>
-
-							{#each [
-								{ key: 'total_installs', label: '总安装量', type: 'number' },
-								{ key: 'daily_installs', label: '日安装量', type: 'number' },
-								{ key: 'ratings', label: '评分', type: 'number', step: '0.1' }
-							] as filter}
-								<div class="lk-filter-group">
-									<label for="{filter.key}_operator">{filter.label}:</label>
-									<div class="lk-filter-row">
-										<select id="{filter.key}_operator" name="{filter.key}_operator">
-											<option value="gt">大于</option>
-											<option value="lt">小于</option>
-											<option value="eq">等于</option>
-										</select>
-										<input type={filter.type} name={filter.key} placeholder="数值" step={filter.step || ''} />
-									</div>
-								</div>
-							{/each}
-
-							{#each [
-								{ key: 'created', label: '创建日期' },
-								{ key: 'updated', label: '更新日期' }
-							] as filter}
-								<div class="lk-filter-group">
-									<label for="{filter.key}_operator">{filter.label}:</label>
-									<div class="lk-filter-row">
-										<select id="{filter.key}_operator" name="{filter.key}_operator">
-											<option value="gt">晚于</option>
-											<option value="lt">早于</option>
-										</select>
-										<input type="datetime-local" name={filter.key} />
-									</div>
-								</div>
-							{/each}
-
-							<div class="lk-filter-group">
-								<label for="entry_locales">脚本语言筛选:</label>
-								<select name="entry_locales[]" multiple size="5" id="entry_locales">
-									{#each localeOptions as loc}
-										<option value={loc.value}>{loc.label}</option>
-									{/each}
-								</select>
-								<small style="display:block;margin-top:4px;color:var(--md-sys-color-on-surface-variant);font-size:12px">按住 Ctrl 键可多选（Windows）</small>
-							</div>
-
-							<input type="hidden" name="tz" value={Intl.DateTimeFormat().resolvedOptions().timeZone} />
-
-							<div style="display:flex;gap:8px;margin-top:12px">
-								<button type="submit" class="md3-button" style="flex:1;height:36px;padding:0 16px;font-size:13px">应用筛选</button>
-								<button type="button" class="md3-outlined-button" style="flex:1;height:36px;padding:0 16px;font-size:13px" onclick={clearFilters}>清除高级筛选</button>
-							</div>
-						</form>
-					</details>
+					{t(lang, 'lookup.warning')}
 				</div>
 			</div>
 		</div>
@@ -683,6 +678,7 @@
 
 	.lk-main { flex: 1; min-width: 0; }
 
+	/* ─── Sidebar ──────────────────────────────────────── */
 	.lk-sidebar {
 		width: 280px; flex-shrink: 0;
 		background: var(--md-sys-color-surface-container-low);
@@ -693,6 +689,7 @@
 		position: sticky; top: 16px;
 		max-height: calc(100vh - 32px);
 		overflow-y: auto;
+		contain: layout style;
 	}
 
 	.lk-sidebar-title {
@@ -733,6 +730,22 @@
 		margin-bottom: 20px;
 	}
 
+	.lk-option-label {
+		font-size: 13px; font-weight: 600;
+		color: var(--md-sys-color-on-surface);
+		margin-bottom: 8px;
+	}
+
+	.lk-chip-row {
+		display: flex; flex-wrap: wrap; gap: 6px;
+	}
+
+	.lk-advanced-summary {
+		font-size: 13px; font-weight: 600;
+		color: var(--md-sys-color-on-surface);
+		cursor: pointer; margin-bottom: 12px;
+	}
+
 	.lk-filter-group { margin-bottom: 12px; }
 	.lk-filter-group label { display: block; margin-bottom: 4px; font-size: 13px; font-weight: 500; color: var(--md-sys-color-on-surface-variant); }
 	.lk-filter-group input,
@@ -751,11 +764,33 @@
 	.lk-filter-row select { width: 60px; flex-shrink: 0; }
 	.lk-filter-row input { flex: 1; }
 
+	.lk-filter-hint {
+		display: block; margin-top: 4px;
+		color: var(--md-sys-color-on-surface-variant);
+		font-size: 12px;
+	}
+
+	.lk-filter-actions {
+		display: flex; gap: 8px; margin-top: 12px;
+	}
+
+	.lk-filter-btn {
+		flex: 1; height: 36px; padding: 0 16px; font-size: 13px;
+	}
+
+	/* ─── Center box (loading / error / empty) ────────── */
 	.lk-center-box {
 		display: flex; flex-direction: column;
 		align-items: center; justify-content: center;
 		padding: 60px 20px; min-height: 400px;
 		text-align: center;
+	}
+
+	.lk-spinner {
+		font-size: 48px;
+		animation: lk-spin 1s linear infinite;
+		display: inline-block;
+		color: var(--md-sys-color-primary);
 	}
 
 	.lk-loading-tip {
@@ -765,6 +800,7 @@
 	}
 	.lk-loading-tip small { font-size: 0.9em; opacity: 0.7; }
 
+	/* ─── Script list ─────────────────────────────────── */
 	.lk-script-list { list-style: none; padding: 0; margin: 0; }
 
 	.lk-result-item {
@@ -775,6 +811,7 @@
 		margin-bottom: 12px;
 		box-shadow: var(--md-sys-elevation-1);
 		opacity: 0;
+		contain: layout style;
 		transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 	}
 	.lk-result-item:hover { box-shadow: var(--md-sys-elevation-2); }
@@ -815,6 +852,7 @@
 
 	.lk-install-area { margin-top: 12px; }
 
+	/* ─── Pagination ──────────────────────────────────── */
 	.lk-pagination {
 		display: flex; justify-content: center; align-items: center;
 		gap: 8px; margin-top: 20px; padding: 12px 0;
@@ -835,6 +873,7 @@
 		color: var(--md-sys-color-on-surface-variant);
 	}
 
+	/* ─── Mobile ──────────────────────────────────────── */
 	@media (max-width: 768px) {
 		.lk-sidebar-toggle { display: flex; align-items:center; justify-content:center; }
 		.lk-layout { flex-direction: column; }

@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
+	import { t, type Lang, i18nConfig } from '$i18n';
 	import { siteConfig, siteProxyUrl } from '$lib/config';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
-	let lang = $derived(data.lang);
+	let lang: Lang = $derived(data.lang);
 
-	// ─── Hash 路由解析 ──────────────────────────────────────────────────────
+	// ─── Hash route parsing ──────────────────────────────────────────────
 	interface RouteInfo {
 		locale: string;
 		scriptId: string | null;
@@ -59,10 +60,7 @@
 		const hash = window.location.hash;
 		if (isHashValid(hash)) {
 			const route = parseHash(hash);
-			if (route) {
-				lastValidHash = hash;
-				return route;
-			}
+			if (route) { lastValidHash = hash; return route; }
 		}
 		const fallback = lastValidHash;
 		return isHashValid(fallback) ? parseHash(fallback) : null;
@@ -85,19 +83,19 @@
 		if (hashInvalidWarningShown) return;
 		hashInvalidWarningShown = true;
 		const toast = document.createElement('div');
-		toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#ff9800;color:white;padding:16px 24px;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,0.2);z-index:10000;display:flex;align-items:center;gap:12px;font-size:14px;animation:slideIn 0.3s ease';
-		toast.innerHTML = '<span class="material-icons" style="font-size:20px">warning</span><span>浏览历史链接已失效，建议重新搜索脚本</span>';
+		toast.style.cssText = 'position:fixed;top:20px;right:20px;background:var(--md-sys-color-error-container);color:var(--md-sys-color-on-error-container);padding:16px 24px;border-radius:var(--md-sys-shape-corner-medium);box-shadow:var(--md-sys-elevation-3);z-index:10000;display:flex;align-items:center;gap:12px;font-size:14px;animation:if-toast-in 0.3s ease';
+		toast.innerHTML = `<span class="material-icons" style="font-size:20px">warning</span><span>${t(lang, 'info.history_invalid_toast')}</span>`;
 		const style = document.createElement('style');
-		style.textContent = '@keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}';
+		style.textContent = '@keyframes if-toast-in{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}';
 		document.head.appendChild(style);
 		document.body.appendChild(toast);
 		setTimeout(() => {
-			toast.style.animation = 'slideIn 0.3s ease reverse';
+			toast.style.animation = 'if-toast-in 0.3s ease reverse';
 			setTimeout(() => toast.remove(), 300);
 		}, 5000);
 	}
 
-	// ─── base64 解码 ──────────────────────────────────────────────────────
+	// ─── Base64 decode ───────────────────────────────────────────────────
 	function decodeBase64(str: string): string {
 		if (!str) return '';
 		try {
@@ -105,49 +103,49 @@
 			const bytes = new Uint8Array(raw.length);
 			for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
 			return new TextDecoder('utf-8').decode(bytes);
-		} catch {
-			return str;
-		}
+		} catch { return str; }
 	}
 
-	// ─── API URL ─────────────────────────────────────────────────────────
+	// ─── API config ──────────────────────────────────────────────────────
 	const INFO_API = siteConfig.infoApi.primary;
 
-	// ─── 页面状态 ─────────────────────────────────────────────────────────
+	// ─── Page state ──────────────────────────────────────────────────────
 	let route = $state<RouteInfo | null>(null);
 	let activeTab = $state<'info' | 'feedback'>('info');
 	let loading = $state(true);
 	let error = $state('');
+	let errorKey = $state('info.error');
 
-	// detail page data
+	// detail
 	let scriptTitle = $state('');
-	let headerHtml = $state('');
 	let scriptMetaHtml = $state('');
 	let additionalInfoHtml = $state('');
 	let installLink = $state('');
 	let installPath = $derived(installLink ? installLink.replace('https://update.greasyfork.org/scripts/', '') : '');
 
-	// feedback page data
+	// feedback
 	let feedbackTitle = $state('');
 	let feedbackListHtml = $state('');
 
-	// users page data
+	// users
 	interface GithubIdentity { name: string; url?: string }
 	interface UserScript { id: number; name?: string; description?: string; daily_installs?: number; total_installs?: number; good_ratings?: number; ok_ratings?: number; bad_ratings?: number; fan_score?: number; created_at?: string; code_updated_at?: string; code_url?: string; deleted?: boolean }
 	interface UserInfo { id: number; name?: string; created_at?: string; bio?: string; github_identities?: GithubIdentity[]; scripts?: UserScript[] }
 	let userData = $state<UserInfo | null>(null);
 
-	// ─── 链接处理 ─────────────────────────────────────────────────────────
+	// ─── Link processing ─────────────────────────────────────────────────
 	function processAllLinks(container: HTMLElement | null, locale: string): void {
 		if (!container) return;
 		container.querySelectorAll('a[href]').forEach((a) => {
 			if (a.hasAttribute('data-processed')) return;
 			const href = a.getAttribute('href');
 			if (!href) return;
+			// Skip already absolute/external URLs
 			if (href.startsWith('http://') || href.startsWith('https://') ||
 				href.startsWith('javascript:') || href.startsWith('mailto:') ||
 				href.startsWith('tel:') || href.includes('?') || href.includes('#')) return;
 
+			// User profile links → internal info page
 			const userMatch = href.match(/\/users\/([^/?]+)/);
 			if (userMatch) {
 				a.setAttribute('href', `#/${locale}/users/${userMatch[1]}`);
@@ -156,14 +154,16 @@
 				return;
 			}
 
+			// By-site links → lookup page
 			const siteMatch = href.match(/\/scripts\/by-site\/([^/?]+)/);
 			if (siteMatch) {
-				a.setAttribute('href', `https://home.greasyfork.org.cn/lookup.php?q=&sort=&filter_locale=0&site=${siteMatch[1]}`);
+				a.setAttribute('href', `/${lang}/lookup#?site=${siteMatch[1]}`);
 				a.setAttribute('data-processed', 'true');
 				if (!a.hasAttribute('target')) a.setAttribute('target', '_blank');
 				return;
 			}
 
+			// All other relative links → proxy
 			const proxy = siteProxyUrl();
 			a.setAttribute('href', proxy + (href.startsWith('/') ? href : '/' + href));
 			a.setAttribute('data-processed', 'true');
@@ -176,13 +176,16 @@
 		return { destroy() {} };
 	}
 
-	// ─── 格式化 ──────────────────────────────────────────────────────────
+	// ─── Formatting ──────────────────────────────────────────────────────
 	function formatDateTime(raw: string): string {
-		if (!raw) return '未知';
-		return new Date(raw).toLocaleString('zh-CN', {
-			year: 'numeric', month: '2-digit', day: '2-digit',
-			hour: '2-digit', minute: '2-digit', hour12: false
-		}).replace(/\//g, '-');
+		if (!raw) return '—';
+		try {
+			const localeTag = i18nConfig.langNames[lang] || 'zh-CN';
+			return new Date(raw).toLocaleString(localeTag, {
+				year: 'numeric', month: '2-digit', day: '2-digit',
+				hour: '2-digit', minute: '2-digit', hour12: false
+			});
+		} catch { return raw; }
 	}
 
 	function escapeHtml(text: string): string {
@@ -191,13 +194,14 @@
 		return div.innerHTML;
 	}
 
-	// ─── 主加载函数 ────────────────────────────────────────────────────
+	// ─── Data loading ────────────────────────────────────────────────────
 	async function loadContent(r: RouteInfo): Promise<void> {
 		abortController?.abort();
 		abortController = new AbortController();
 		const signal = abortController.signal;
 		loading = true;
 		error = '';
+		errorKey = 'info.error';
 
 		try {
 			if (r.pageType === 'users') {
@@ -217,7 +221,7 @@
 			}
 		} catch (e) {
 			if ((e as Error).name !== 'AbortError') {
-				error = '加载失败: ' + ((e as Error).message || '未知错误');
+				error = `${t(lang, 'info.generic_error')}: ${(e as Error).message || ''}`;
 			}
 		} finally {
 			loading = false;
@@ -231,11 +235,10 @@
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		scriptTitle = json.title || '';
-		headerHtml = decodeBase64(json.c1);
 		scriptMetaHtml = decodeBase64(json.c2);
 		additionalInfoHtml = decodeBase64(json.c3);
 		installLink = json.install || '';
-		document.title = scriptTitle ? `${scriptTitle} - 用户脚本` : '脚本详情';
+		document.title = scriptTitle ? `${scriptTitle} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
 	}
 
 	async function loadFeedbackPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
@@ -245,8 +248,8 @@
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		feedbackTitle = json.title || '';
-		feedbackListHtml = decodeBase64(json.c1) || '<p style="text-align:center;color:#999;">暂无反馈信息</p>';
-		document.title = feedbackTitle ? `${feedbackTitle} - 反馈` : '反馈';
+		feedbackListHtml = decodeBase64(json.c1) || `<p style="text-align:center;color:var(--md-sys-color-on-surface-variant);padding:40px">${t(lang, 'info.no_feedback')}</p>`;
+		document.title = feedbackTitle ? `${feedbackTitle} - ${t(lang, 'info.feedback_tab')}` : t(lang, 'info.feedback_tab');
 	}
 
 	async function loadUserPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
@@ -255,10 +258,10 @@
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		userData = json;
-		document.title = json.name ? `${json.name} - 用户` : '用户信息';
+		document.title = json.name ? `${json.name} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
 	}
 
-	// ─── 触发生命周期 ──────────────────────────────────────────────────
+	// ─── Lifecycle ──────────────────────────────────────────────────────
 	let debounceTimer: ReturnType<typeof setTimeout>;
 
 	onMount(() => {
@@ -274,7 +277,6 @@
 		const onPop = () => {
 			clearTimeout(debounceTimer);
 			debounceTimer = setTimeout(() => {
-				clearTimeout(debounceTimer);
 				if (window.location.hash === '#google_vignette') return;
 				initPage();
 			}, 100);
@@ -285,7 +287,6 @@
 			if (document.hidden && abortController) abortController.abort();
 		});
 
-		// Click interception for hash links → _blank
 		document.addEventListener('click', (e) => {
 			const a = (e.target as Element).closest('a[href]');
 			if (!a) return;
@@ -298,7 +299,6 @@
 			}
 		}, true);
 
-		// DOM observer for dynamic links
 		const observer = new MutationObserver((mutations) => {
 			for (const m of mutations) {
 				if (m.type === 'childList') {
@@ -334,7 +334,8 @@
 		const r = getRoute();
 		if (!r) {
 			initialParamChecked = true;
-			error = '无效的页面访问 — 检测到初始参数为空或已失效，请重新搜索脚本';
+			error = t(lang, 'info.invalid_hash');
+			errorKey = 'info.error';
 			loading = false;
 			return;
 		}
@@ -342,8 +343,8 @@
 		if (!initialParamChecked) {
 			if (!isHashValid(window.location.hash) && isHashValid(lastValidHash)) {
 				showHashInvalidWarning();
-				if (!document.title.startsWith('[历史记录已失效]')) {
-					document.title = `[历史记录已失效] ${document.title}`;
+				if (!document.title.startsWith('[')) {
+					document.title = `${t(lang, 'info.history_invalid_title')} ${document.title}`;
 				}
 			}
 			initialParamChecked = true;
@@ -368,81 +369,80 @@
 <section class="info-page-root">
 	<div class="width-constraint">
 		{#if loading}
-			<div class="md3-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;min-height:400px;text-align:center">
-				<span class="material-icons" style="font-size:48px;animation:if-spin 1s linear infinite;display:inline-block;color:var(--md-sys-color-primary)">autorenew</span>
-				<div style="text-align:center;line-height:1.6;margin-top:20px;color:var(--md-sys-color-on-surface-variant)">
-					少女祈祷中…正等待加载脚本信息。<br />
-					<small style="font-size:0.9em;opacity:0.7">注意: 所有内容均来源于网络，可靠性未知，请注意甄别代码以及相关内容，谨防欺诈。</small>
+			<div class="md3-card if-loading-box">
+				<span class="material-icons if-spinner">autorenew</span>
+				<div class="if-loading-tip">
+					{t(lang, 'info.loading')}<br />
+					<small>{t(lang, 'info.loading_notice')}</small>
 				</div>
 			</div>
 		{:else if error}
-			<div class="md3-card" style="text-align:center;padding:40px">
-				<h3 class="title-large" style="margin-bottom:12px">加载失败</h3>
-				<p style="color:var(--md-sys-color-on-surface-variant)">{error}</p>
-				<p style="margin-top:20px">
-					<button onclick={() => window.location.reload()} class="md3-button">刷新页面重试</button>
-				</p>
+			<div class="md3-card if-error-box">
+				<span class="material-icons" style="font-size:48px;color:var(--md-sys-color-error)">error_outline</span>
+				<h3 class="title-large" style="margin:12px 0">{t(lang, 'info.error')}</h3>
+				<p style="color:var(--md-sys-color-on-surface-variant);margin-bottom:20px">{error}</p>
+				<button onclick={() => window.location.reload()} class="md3-button">{t(lang, 'info.retry')}</button>
 			</div>
 		{:else if userData}
-			<!-- 用户页面 -->
-			<section class="md3-card" style="margin-bottom:16px">
-				<header style="margin-bottom:24px">
-					<h1 class="headline-large" style="margin-bottom:16px">{escapeHtml(userData.name || '未知用户')}</h1>
+			<!-- User page -->
+			<section class="md3-card if-user-card">
+				<header class="if-user-header">
+					<h1 class="headline-large">{escapeHtml(userData.name || t(lang, 'info.unknown_user'))}</h1>
 					<dl class="if-user-stats">
-						<dt>脚本数</dt>
+						<dt>{t(lang, 'info.script_count')}</dt>
 						<dd>{userData.scripts?.filter(s => !s.deleted).length || 0}</dd>
-						<dt>总安装量</dt>
+						<dt>{t(lang, 'info.total_installs')}</dt>
 						<dd>{((userData.scripts?.reduce((sum, s) => sum + (s.total_installs || 0), 0) || 0)).toLocaleString()}</dd>
-						<dt>好评</dt>
+						<dt>{t(lang, 'info.good_ratings')}</dt>
 						<dd class="if-good">{userData.scripts?.reduce((sum, s) => sum + (s.good_ratings || 0), 0) || 0}</dd>
-						<dt>一般</dt>
+						<dt>{t(lang, 'info.ok_ratings')}</dt>
 						<dd class="if-ok">{userData.scripts?.reduce((sum, s) => sum + (s.ok_ratings || 0), 0) || 0}</dd>
-						<dt>差评</dt>
+						<dt>{t(lang, 'info.bad_ratings')}</dt>
 						<dd class="if-bad">{userData.scripts?.reduce((sum, s) => sum + (s.bad_ratings || 0), 0) || 0}</dd>
-						<dt>注册于</dt>
+						<dt>{t(lang, 'info.registered')}</dt>
 						<dd>{formatDateTime(userData.created_at || '')}</dd>
 					</dl>
 				</header>
 				<div>
-					<h3 class="title-large" style="margin-bottom:16px">脚本</h3>
+					<h3 class="title-large" style="margin-bottom:16px">{t(lang, 'info.scripts')}</h3>
 					{#if userData.scripts && userData.scripts.filter(s => !s.deleted).length > 0}
 						<ol class="if-script-list">
 							{#each userData.scripts.filter(s => !s.deleted) as script, i (script.id)}
 								<li class="if-result-item" style="animation: if-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 									<article>
 										<h2>
-											<a class="if-script-link" href={`#/${route?.locale || 'zh-CN'}/scripts/${script.id}/detail`} target="_blank" rel="noopener noreferrer">
-												{script.name || '未命名'}
+											<a class="if-script-link" href={`#/${route?.locale || i18nConfig.langNames[lang]}/scripts/${script.id}/detail`} target="_blank" rel="noopener noreferrer">
+												{script.name || t(lang, 'info.unnamed')}
 											</a>
 											<span class="if-badge-js">JS</span>
 											<span class="if-sep">-</span>
-											<span class="if-script-desc">{escapeHtml(script.description || '暂无描述')}</span>
+											<span class="if-script-desc">{escapeHtml(script.description || t(lang, 'info.no_description'))}</span>
 										</h2>
 										<div class="if-script-meta">
 											<dl class="if-stats">
-												<dt>作者</dt>
-												<dd>{escapeHtml(userData.name || '未知')}</dd>
-												<dt>日安装量</dt>
+												<dt>{t(lang, 'lookup.author')}</dt>
+												<dd>{escapeHtml(userData.name || t(lang, 'info.unknown_author'))}</dd>
+												<dt>{t(lang, 'lookup.daily_installs')}</dt>
 												<dd>{script.daily_installs || 0}</dd>
-												<dt>总安装量</dt>
+												<dt>{t(lang, 'lookup.total_installs')}</dt>
 												<dd>{script.total_installs || 0}</dd>
-												<dt>评分</dt>
+												<dt>{t(lang, 'lookup.ratings')}</dt>
 												<dd>
 													<span class="if-good">{script.good_ratings || 0}</span>
 													<span class="if-ok">{script.ok_ratings || 0}</span>
 													<span class="if-bad">{script.bad_ratings || 0}</span>
 												</dd>
-												<dt>创建于</dt>
+												<dt>{t(lang, 'lookup.created')}</dt>
 												<dd>{formatDateTime(script.created_at || '')}</dd>
-												<dt>更新于</dt>
+												<dt>{t(lang, 'lookup.updated')}</dt>
 												<dd>{formatDateTime(script.code_updated_at || '')}</dd>
 											</dl>
 											<div style="margin-top:12px">
 												{#if script.code_url}
 													{@const dl = `/${lang}/l#/` + script.code_url.replace('https://update.greasyfork.org/scripts/', '')}
-													<a href={dl} class="md3-button" target="_blank" rel="noopener noreferrer">立即安装此脚本</a>
+													<a href={dl} class="md3-button" target="_blank" rel="noopener noreferrer">{t(lang, 'info.install')}</a>
 												{:else}
-													<a href={null} class="md3-button" target="_blank" rel="noopener noreferrer">立即安装此脚本</a>
+													<a href={null} class="md3-button" target="_blank" rel="noopener noreferrer">{t(lang, 'info.install')}</a>
 												{/if}
 											</div>
 										</div>
@@ -451,52 +451,71 @@
 							{/each}
 						</ol>
 					{:else}
-						<p style="text-align:center;color:var(--md-sys-color-on-surface-variant);padding:40px 0">该用户暂无脚本</p>
+						<p class="if-no-content">{t(lang, 'info.no_scripts')}</p>
 					{/if}
 				</div>
 			</section>
 		{:else if route}
-			<!-- 脚本页面 -->
+			<!-- Script page -->
 			<section>
-				<div class="if-notice-bar" style="margin-bottom:16px">
-					你正在访问的内容是外部程序的镜像地址，仅用于用户加速访问，本站无法保证其可靠性，源站链接
-					<a id="source-link" href="https://greasyfork.org{route.fullPath.replace(/\/detail$/, '')}" target="_blank" rel="noopener noreferrer" style="color:var(--md-sys-color-primary)">点此以跳转</a>。
+				<!-- Notice bar -->
+				<div class="if-notice-bar">
+					{t(lang, 'info.notice')}
+					<a id="source-link" href="https://greasyfork.org{route.fullPath.replace(/\/detail$/, '')}" target="_blank" rel="noopener noreferrer" class="if-source-link">
+						{t(lang, 'info.source_link')}
+					</a>
 				</div>
 
 				<!-- Tabs -->
-				<div class="md3-tabs" style="margin-bottom:0">
+				<div class="md3-tabs">
 					<button class="md3-tab" class:active={activeTab === 'info'} onclick={e => { e.preventDefault(); switchTab('info'); }}>
-						信息
+						{t(lang, 'info.info_tab')}
 					</button>
 					<button class="md3-tab" class:active={activeTab === 'feedback'} onclick={e => { e.preventDefault(); switchTab('feedback'); }}>
-						反馈
+						{t(lang, 'info.feedback_tab')}
 					</button>
 				</div>
 
-				<!-- 安装区域 -->
-				<details class="if-install-details">
-					<summary>点击查看源站下载链接地址</summary>
-					<code>{installLink || '加载中...'}</code>
-				</details>
-				<div style="display:flex;align-items:center;gap:8px;margin:12px 0 20px">
+				<!-- Install row -->
+				<div class="if-install-row">
 					<a href="/{lang}/l#/{installPath}" class="md3-button" target="_blank" rel="noopener noreferrer">
-						安装此脚本
+						{t(lang, 'info.install')}
 					</a>
-					<a href="/page/installing-user-scripts" style="color:var(--md-sys-color-on-surface-variant);text-decoration:none;font-size:18px;padding:8px" title="如何安装" rel="nofollow">?</a>
+					<a href="/{lang}/installing" class="if-help-link" title={t(lang, 'info.install_help')} rel="nofollow">?</a>
+					{#if installLink}
+						<details class="if-install-details">
+							<summary>{t(lang, 'info.install_details')}</summary>
+							<code>{installLink}</code>
+						</details>
+					{/if}
 				</div>
 
 				<!-- Info Tab -->
 				{#if activeTab === 'info'}
-					<div class="if-content-area" id="script-header" use:processLinks={lang}>{@html headerHtml}</div>
-					{#if scriptMetaHtml}
-						<div class="if-content-area" id="script-meta" use:processLinks={lang}>{@html scriptMetaHtml}</div>
+					<!-- Script title (from API, shown above meta) -->
+					{#if scriptTitle}
+						<h2 class="if-script-page-title">{scriptTitle}</h2>
 					{/if}
+
+					<!-- Script meta block (from API c2) -->
+					{#if scriptMetaHtml}
+						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={lang}>{@html scriptMetaHtml}</div>
+					{/if}
+
+					<!-- Additional info (from API c3) -->
 					{#if additionalInfoHtml}
-						<div class="if-content-area" id="additional-info" use:processLinks={lang}>{@html additionalInfoHtml}</div>
+						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={lang}>{@html additionalInfoHtml}</div>
+					{/if}
+
+					{#if !scriptMetaHtml && !additionalInfoHtml}
+						<div class="md3-card if-no-content">
+							<p>{t(lang, 'info.no_description')}</p>
+						</div>
 					{/if}
 				{:else}
+					<!-- Feedback Tab -->
 					{#if feedbackListHtml}
-						<div class="if-content-area" id="feedback-list" use:processLinks={lang}>{@html feedbackListHtml}</div>
+						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={lang}>{@html feedbackListHtml}</div>
 					{/if}
 				{/if}
 			</section>
@@ -513,6 +532,36 @@
 		padding: 24px 0;
 	}
 
+	/* ─── Loading / Error ─────────────────────────────── */
+	.if-loading-box {
+		display: flex; flex-direction: column; align-items: center; justify-content: center;
+		padding: 60px 20px; min-height: 400px; text-align: center;
+	}
+	.if-spinner {
+		font-size: 48px; animation: if-spin 1s linear infinite; display: inline-block;
+		color: var(--md-sys-color-primary);
+	}
+	.if-loading-tip {
+		text-align: center; line-height: 1.6; margin-top: 20px;
+		color: var(--md-sys-color-on-surface-variant); max-width: 500px;
+	}
+	.if-loading-tip small { font-size: 0.9em; opacity: 0.7; }
+
+	.if-error-box {
+		text-align: center; padding: 40px;
+		display: flex; flex-direction: column; align-items: center;
+	}
+
+	.if-no-content {
+		text-align: center; color: var(--md-sys-color-on-surface-variant);
+		padding: 40px;
+	}
+
+	/* ─── User page ───────────────────────────────────── */
+	.if-user-card { margin-bottom: 16px; padding: 24px; }
+	.if-user-header { margin-bottom: 24px; }
+	.if-user-header h1 { margin-bottom: 16px; }
+
 	.if-user-stats {
 		display: flex; flex-wrap: wrap; gap: 4px 16px;
 		font-size: 14px; margin: 0;
@@ -521,43 +570,10 @@
 	.if-user-stats dd { margin: 0 12px 0 4px; }
 
 	.if-good { color: #4caf50; }
-	.if-ok { color: #ff9800; }
+	.if-ok { color: #ff9800; margin: 0 4px; }
 	.if-bad { color: var(--md-sys-color-error); }
 
-	.if-notice-bar {
-		padding: 10px 16px;
-		background: var(--md-sys-color-surface-container-highest);
-		border: 1px solid var(--md-sys-color-outline-variant);
-		border-radius: var(--md-sys-shape-corner-small);
-		font-size: 13px;
-		color: var(--md-sys-color-on-surface-variant);
-	}
-
-	.if-install-details {
-		padding: 12px 0;
-		font-size: 13px;
-		color: var(--md-sys-color-on-surface-variant);
-	}
-	.if-install-details summary { cursor: pointer; }
-	.if-install-details code {
-		display: block; margin-top: 8px; padding: 8px;
-		background: var(--md-sys-color-surface-container-highest);
-		border-radius: var(--md-sys-shape-corner-small);
-		word-break: break-all; font-size: 12px;
-		color: var(--md-sys-color-on-surface);
-	}
-
-	.if-content-area {
-		background: var(--md-sys-color-surface-container-low);
-		border: 1px solid var(--md-sys-color-outline-variant);
-		border-radius: var(--md-sys-shape-corner-medium);
-		padding: 24px;
-		margin-bottom: 16px;
-		box-shadow: var(--md-sys-elevation-1);
-	}
-
 	.if-script-list { list-style: none; padding: 0; margin: 0; }
-
 	.if-result-item {
 		border: 1px solid var(--md-sys-color-outline-variant);
 		border-radius: var(--md-sys-shape-corner-medium);
@@ -568,21 +584,16 @@
 		transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 	}
 	.if-result-item:hover { box-shadow: var(--md-sys-elevation-1); }
-
-	@keyframes if-fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
 	.if-result-item h2 {
 		margin: 0 0 10px; font-size: 16px;
 		display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap;
 	}
-
 	.if-script-link { color: var(--md-sys-color-primary); text-decoration: none; font-weight: 600; }
 	.if-script-link:hover { text-decoration: underline; }
 	.if-badge-js { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
 	.if-sep { color: var(--md-sys-color-outline-variant); }
 	.if-script-desc { color: var(--md-sys-color-on-surface-variant); font-size: 14px; font-weight: normal; }
 	.if-script-meta { margin-top: 8px; }
-
 	.if-stats {
 		display: flex; flex-wrap: wrap; gap: 4px 16px;
 		font-size: 13px; margin: 0 0 10px; padding: 0;
@@ -590,5 +601,349 @@
 	.if-stats dt { color: var(--md-sys-color-on-surface-variant); }
 	.if-stats dd { margin: 0 12px 0 4px; }
 
+	/* ─── Script page chrome ──────────────────────────── */
+	.if-notice-bar {
+		padding: 10px 16px;
+		background: var(--md-sys-color-surface-container-highest);
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-small);
+		font-size: 13px;
+		color: var(--md-sys-color-on-surface-variant);
+		margin-bottom: 16px;
+	}
+	.if-source-link { color: var(--md-sys-color-primary); margin-left: 4px; }
+
+	.if-install-row {
+		display: flex; align-items: center; gap: 8px; margin: 12px 0 20px;
+		flex-wrap: wrap;
+	}
+	.if-help-link {
+		color: var(--md-sys-color-on-surface-variant);
+		text-decoration: none; font-size: 18px; padding: 8px;
+	}
+	.if-install-details {
+		font-size: 13px;
+		color: var(--md-sys-color-on-surface-variant);
+		margin-left: auto;
+	}
+	.if-install-details summary { cursor: pointer; }
+	.if-install-details code {
+		display: block; margin-top: 8px; padding: 8px;
+		background: var(--md-sys-color-surface-container-highest);
+		border-radius: var(--md-sys-shape-corner-small);
+		word-break: break-all; font-size: 12px;
+		color: var(--md-sys-color-on-surface);
+		max-width: 600px;
+	}
+
+	.if-script-page-title {
+		font-size: var(--md-sys-typescale-headline-medium);
+		font-weight: 500;
+		margin: 0 0 16px;
+		color: var(--md-sys-color-on-surface);
+	}
+
+	/* ─── GF content containers ───────────────────────── */
+	.if-content-area {
+		background: var(--md-sys-color-surface-container-low);
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-medium);
+		padding: 24px;
+		margin-bottom: 16px;
+		box-shadow: var(--md-sys-elevation-1);
+		overflow-x: auto;
+	}
+
+	/* ===================================================
+	   Greasy Fork HTML fragment styles
+	   These match the original GF look within our MD3 theme
+	   =================================================== */
+
+	/* ── Meta block (c2) ─────────────────────────────── */
+	.if-gf-meta :global(.script-meta-block) {
+		font-size: 14px;
+	}
+
+	.if-gf-meta :global(.inline-script-stats) {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: 8px 16px;
+		align-items: baseline;
+		margin: 0;
+	}
+
+	.if-gf-meta :global(.inline-script-stats dt) {
+		color: var(--md-sys-color-on-surface-variant);
+		font-weight: 500;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+
+	.if-gf-meta :global(.inline-script-stats dd) {
+		margin: 0;
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.if-gf-meta :global(.inline-script-stats a) {
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+	}
+	.if-gf-meta :global(.inline-script-stats a:hover) {
+		text-decoration: underline;
+	}
+
+	/* Rating counts */
+	.if-gf-meta :global(.good-rating-count) {
+		color: #4caf50;
+		font-weight: 600;
+	}
+	.if-gf-meta :global(.ok-rating-count) {
+		color: #ff9800;
+		margin: 0 6px;
+		font-weight: 600;
+	}
+	.if-gf-meta :global(.bad-rating-count) {
+		color: var(--md-sys-color-error);
+		font-weight: 600;
+	}
+
+	/* Antifeatures */
+	.if-gf-meta :global(.script-antifeatures) {
+		color: var(--md-sys-color-error);
+	}
+
+	/* Applies-to site list */
+	.if-gf-meta :global(.block-list) {
+		list-style: none;
+		padding: 0;
+		margin: 4px 0 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 8px;
+	}
+
+	.if-gf-meta :global(.block-list li) {
+		display: inline;
+	}
+
+	.if-gf-meta :global(.block-list a) {
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+		font-size: 13px;
+	}
+	.if-gf-meta :global(.block-list a:hover) {
+		text-decoration: underline;
+	}
+
+	.if-gf-meta :global(.expandable) {
+		max-height: none;
+	}
+
+	/* ── User content / additional info (c3) ─────────── */
+	.if-gf-content {
+		font-size: 14px;
+		line-height: 1.7;
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.if-gf-content :global(h3) {
+		font-size: var(--md-sys-typescale-title-medium);
+		font-weight: 500;
+		margin: 24px 0 12px;
+		color: var(--md-sys-color-on-surface);
+		border-bottom: 1px solid var(--md-sys-color-outline-variant);
+		padding-bottom: 8px;
+	}
+
+	.if-gf-content :global(h3:first-child) {
+		margin-top: 0;
+	}
+
+	.if-gf-content :global(p) {
+		margin: 0 0 12px;
+	}
+
+	.if-gf-content :global(strong) {
+		font-weight: 600;
+	}
+
+	.if-gf-content :global(a) {
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+		word-break: break-all;
+	}
+	.if-gf-content :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.if-gf-content :global(img) {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--md-sys-shape-corner-small);
+		margin: 12px 0;
+		border: 1px solid var(--md-sys-color-outline-variant);
+	}
+
+	.if-gf-content :global(table) {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 12px 0;
+		font-size: 13px;
+	}
+
+	.if-gf-content :global(th) {
+		background: var(--md-sys-color-surface-container-highest);
+		color: var(--md-sys-color-on-surface);
+		font-weight: 600;
+		padding: 10px 14px;
+		text-align: left;
+		border-bottom: 2px solid var(--md-sys-color-outline-variant);
+	}
+
+	.if-gf-content :global(td) {
+		padding: 10px 14px;
+		border-bottom: 1px solid var(--md-sys-color-outline-variant);
+		vertical-align: top;
+	}
+
+	.if-gf-content :global(tr:hover td) {
+		background: var(--md-sys-color-surface-container-low);
+	}
+
+	.if-gf-content :global(code) {
+		background: var(--md-sys-color-surface-container-highest);
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-size: 0.9em;
+		font-family: 'Consolas', 'Monaco', monospace;
+	}
+
+	.if-gf-content :global(pre) {
+		background: var(--md-sys-color-surface-container-highest);
+		padding: 16px;
+		border-radius: var(--md-sys-shape-corner-small);
+		overflow-x: auto;
+		font-size: 13px;
+		line-height: 1.5;
+		margin: 12px 0;
+	}
+
+	.if-gf-content :global(blockquote) {
+		border-left: 3px solid var(--md-sys-color-primary);
+		padding: 8px 16px;
+		margin: 12px 0;
+		color: var(--md-sys-color-on-surface-variant);
+		background: var(--md-sys-color-surface-container-low);
+		border-radius: 0 var(--md-sys-shape-corner-small) var(--md-sys-shape-corner-small) 0;
+	}
+
+	.if-gf-content :global(ul), .if-gf-content :global(ol) {
+		margin: 8px 0;
+		padding-left: 24px;
+	}
+
+	.if-gf-content :global(li) {
+		margin-bottom: 4px;
+	}
+
+	/* Hide non-functional GF elements */
+	.if-gf-content :global(.install-link),
+	.if-gf-content :global(.install-help-link),
+	.if-gf-content :global(dialog),
+	.if-gf-meta :global(dialog) {
+		display: none !important;
+	}
+
+	/* ── Feedback list (c1 from feedback endpoint) ───── */
+	.if-gf-feedback {
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	.if-gf-feedback :global(.script-discussion-list) {
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+
+	.if-gf-feedback :global(.discussion) {
+		padding: 16px;
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-small);
+		background: var(--md-sys-color-surface);
+	}
+
+	.if-gf-feedback :global(.discussion-header) {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 8px;
+		font-size: 13px;
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.if-gf-feedback :global(.discussion-rating) {
+		font-weight: 600;
+	}
+
+	.if-gf-feedback :global(.good-rating-count) {
+		color: #4caf50;
+	}
+	.if-gf-feedback :global(.ok-rating-count) {
+		color: #ff9800;
+		margin: 0 4px;
+	}
+	.if-gf-feedback :global(.bad-rating-count) {
+		color: var(--md-sys-color-error);
+	}
+
+	.if-gf-feedback :global(a) {
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+	}
+	.if-gf-feedback :global(a:hover) {
+		text-decoration: underline;
+	}
+
+	.if-gf-feedback :global(p) {
+		margin: 0 0 8px;
+	}
+
+	.if-gf-feedback :global(code) {
+		background: var(--md-sys-color-surface-container-highest);
+		padding: 2px 6px;
+		border-radius: 4px;
+		font-size: 0.9em;
+	}
+
+	.if-gf-feedback :global(pre) {
+		background: var(--md-sys-color-surface-container-highest);
+		padding: 12px;
+		border-radius: var(--md-sys-shape-corner-small);
+		overflow-x: auto;
+		font-size: 13px;
+		margin: 8px 0;
+	}
+
+	/* ── Responsive ───────────────────────────────────── */
+	@media (max-width: 600px) {
+		.if-gf-meta :global(.inline-script-stats) {
+			grid-template-columns: 1fr;
+			gap: 2px 0;
+		}
+		.if-gf-meta :global(.inline-script-stats dt) {
+			margin-top: 8px;
+		}
+
+		.if-install-details {
+			margin-left: 0;
+			width: 100%;
+		}
+		.if-install-details code {
+			max-width: 100%;
+		}
+	}
+
 	@keyframes if-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+	@keyframes if-fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 </style>

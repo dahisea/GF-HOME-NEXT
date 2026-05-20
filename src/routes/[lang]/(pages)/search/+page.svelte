@@ -6,26 +6,10 @@
 	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
-	function animateOnIntersect(node: HTMLElement) {
-		const obs = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((e) => {
-					if (e.isIntersecting) {
-						node.classList.add('md3-animate-enter');
-						obs.unobserve(node);
-					}
-				});
-			},
-			{ threshold: 0.1 }
-		);
-		obs.observe(node);
-		return { destroy: () => obs.disconnect() };
-	}
-
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	// ─── Hash state management (for advanced filters persistence) ───
+	// ─── Hash state management ─────────────────────────────────────────
 	function hashGet(): Record<string, string> {
 		const h = window.location.hash;
 		if (!h || !h.startsWith('#?') || h === '#google_vignette') return {};
@@ -43,7 +27,7 @@
 		window.location.hash = s ? '#?' + s : '';
 	}
 
-	// ─── Basic search form ──────────────────────────────────────────────
+	// ─── Basic search form ─────────────────────────────────────────────
 	function handleBasicSubmit(e: Event) {
 		const form = e.target as HTMLFormElement;
 		const siteInput = form.querySelector<HTMLInputElement>('[name="site"]');
@@ -52,7 +36,7 @@
 		}
 	}
 
-	// ─── Advanced filter values ────────────────────────────────────────
+	// ─── Advanced filter state ─────────────────────────────────────────
 	let totalInstallsOp = $state('gt');
 	let totalInstalls = $state('');
 	let dailyInstallsOp = $state('gt');
@@ -63,10 +47,8 @@
 	let created = $state('');
 	let updatedOp = $state('after');
 	let updated = $state('');
-	let locales: string[] = $state([]);
 	let tz = $state('');
 
-	// Available locales for the multi-select
 	const localeOptions = [
 		{ value: '187', label: '简体中文 (zh-CN)' },
 		{ value: '188', label: '繁體中文 (zh-TW)' },
@@ -96,7 +78,7 @@
 		if (updated) { params.set('updated_op', updatedOp); params.set('updated', updated); }
 		if (tz) params.set('tz', tz);
 		hashSet(Object.fromEntries(params));
-		alert('Filter conditions applied. You can view the results by submitting the script search above.');
+		alert('Filter conditions applied. Results will reflect when you submit a script search.');
 	}
 
 	function clearAdvancedFilters() {
@@ -105,12 +87,11 @@
 		ratingsOp = 'gt'; ratings = '';
 		createdOp = 'after'; created = '';
 		updatedOp = 'after'; updated = '';
-		locales = []; tz = '';
+		tz = '';
 		hashSet({});
-		alert('All advanced filter conditions have been cleared.');
+		alert('All advanced filter conditions cleared.');
 	}
 
-	// ─── Restore filters from hash on mount ────────────────────────────
 	onMount(() => {
 		const stored = hashGet();
 		if (stored.total_installs_op) totalInstallsOp = stored.total_installs_op;
@@ -126,7 +107,6 @@
 		if (stored.tz) tz = stored.tz;
 
 		if (!stored.tz && !stored.total_installs && !stored.daily_installs) {
-			// auto-detect timezone
 			tick().then(() => {
 				try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch {}
 			});
@@ -140,23 +120,34 @@
 </svelte:head>
 
 <div class="width-constraint">
-	<section class="text-content">
-		<!-- Top Ad (en/ja only) -->
+	<section class="sr-page">
+		<!-- Top Ad -->
 		{#if shouldShowAds(lang)}
 			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
 		{/if}
 
-		<!-- Basic Script Search -->
-		<form class="script-search" action="/{lang}/s" accept-charset="UTF-8" method="get" onsubmit={handleBasicSubmit}>
-			<h3>{t(lang, 'search.script_search_title')}</h3>
-			<p style="color:var(--md-sys-color-on-surface-variant);font-size:14px">{t(lang, 'search.script_search_desc')}</p>
-			<p style="color:var(--md-sys-color-on-surface-variant);font-size:14px;margin-top:4px">{t(lang, 'search.enter_keywords')}</p>
-			<input type="search" name="q" placeholder={t(lang, 'search.placeholder')} style="display:block;width:100%;max-width:400px;margin-top:8px;padding:10px 16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-full);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
-			<p style="color:var(--md-sys-color-on-surface-variant);font-size:14px;margin-top:12px">{t(lang, 'search.enter_domain_desc')}</p>
-			<input type="search" name="site" id="site-input" placeholder={t(lang, 'search.site.placeholder')} style="display:block;width:100%;max-width:400px;margin-top:4px;padding:10px 16px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-full);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+		<!-- ── Basic Search ────────────────────────────────────────── -->
+		<form class="sr-basic-card" action="/{lang}/s" accept-charset="UTF-8" method="get" onsubmit={handleBasicSubmit}>
+			<h3 class="sr-card-title">{t(lang, 'search.script_search_title')}</h3>
+			<p class="sr-card-desc">{t(lang, 'search.script_search_desc')}</p>
+			<p class="sr-card-desc">{t(lang, 'search.enter_keywords')}</p>
+			<input
+				type="search"
+				name="q"
+				class="sr-input sr-input--pill"
+				placeholder={t(lang, 'search.placeholder')}
+			/>
+			<p class="sr-card-desc" style="margin-top:16px">{t(lang, 'search.enter_domain_desc')}</p>
+			<input
+				type="search"
+				name="site"
+				id="site-input"
+				class="sr-input sr-input--pill"
+				placeholder={t(lang, 'search.site.placeholder')}
+			/>
 			<input type="hidden" name="sort" value="" />
 			<input type="hidden" name="filter_locale" value="0" />
-			<div style="margin-top:16px">
+			<div class="sr-search-action">
 				<button type="submit" class="search-icon-btn md3-ripple" aria-label={t(lang, 'search.button')}>
 					<svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -165,104 +156,102 @@
 			</div>
 		</form>
 
-		<!-- Advanced Search Options -->
-		<div class="md3-card" style="margin-top:32px;padding:20px 24px;opacity:0;transform:translateY(24px)" use:animateOnIntersect>
+		<!-- ── Advanced Filters ────────────────────────────────────── -->
+		<div class="sr-advanced-card">
 			<details open>
-				<summary style="font-size:16px;font-weight:500;color:var(--md-sys-color-on-surface);cursor:pointer;user-select:none;padding:4px 0">
-					⚙️ {t(lang, 'search.advanced_options')}
-				</summary>
+				<summary class="sr-advanced-summary">{t(lang, 'search.advanced_options')}</summary>
 
-				<form id="advanced-search-form" onsubmit={e => { e.preventDefault(); applyFilters(); }} style="margin-top:16px;display:flex;flex-direction:column;gap:16px">
+				<form id="advanced-search-form" class="sr-advanced-form" onsubmit={e => { e.preventDefault(); applyFilters(); }}>
 					<!-- Total Installs -->
-					<div class="filter-group">
-						<span style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.total_installs')}</span>
-						<div class="filter-row" style="display:flex;gap:12px">
-							<select bind:value={totalInstallsOp} style="flex:1;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface)">
+					<div class="sr-filter-group">
+						<label for="adv-total-op">{t(lang, 'search.filter.total_installs')}</label>
+						<div class="sr-filter-row">
+							<select id="adv-total-op" bind:value={totalInstallsOp}>
 								<option value="gt">{t(lang, 'search.operator.gt')}</option>
 								<option value="lt">{t(lang, 'search.operator.lt')}</option>
 								<option value="eq">{t(lang, 'search.operator.eq')}</option>
 							</select>
-							<input type="number" bind:value={totalInstalls} placeholder="1000" min="0" style="flex:2;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+							<input type="number" bind:value={totalInstalls} placeholder="1000" min="0" />
 						</div>
 					</div>
 
 					<!-- Daily Installs -->
-					<div class="filter-group">
-						<span style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.daily_installs')}</span>
-						<div class="filter-row" style="display:flex;gap:12px">
-							<select bind:value={dailyInstallsOp} style="flex:1;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface)">
+					<div class="sr-filter-group">
+						<label for="adv-daily-op">{t(lang, 'search.filter.daily_installs')}</label>
+						<div class="sr-filter-row">
+							<select id="adv-daily-op" bind:value={dailyInstallsOp}>
 								<option value="gt">{t(lang, 'search.operator.gt')}</option>
 								<option value="lt">{t(lang, 'search.operator.lt')}</option>
 								<option value="eq">{t(lang, 'search.operator.eq')}</option>
 							</select>
-							<input type="number" bind:value={dailyInstalls} placeholder="100" min="0" style="flex:2;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+							<input type="number" bind:value={dailyInstalls} placeholder="100" min="0" />
 						</div>
 					</div>
 
 					<!-- Ratings -->
-					<div class="filter-group">
-						<span style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.ratings')}</span>
-						<div class="filter-row" style="display:flex;gap:12px">
-							<select bind:value={ratingsOp} style="flex:1;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface)">
+					<div class="sr-filter-group">
+						<label for="adv-ratings-op">{t(lang, 'search.filter.ratings')}</label>
+						<div class="sr-filter-row">
+							<select id="adv-ratings-op" bind:value={ratingsOp}>
 								<option value="gt">{t(lang, 'search.operator.gt')}</option>
 								<option value="lt">{t(lang, 'search.operator.lt')}</option>
 								<option value="eq">{t(lang, 'search.operator.eq')}</option>
 							</select>
-							<input type="number" bind:value={ratings} placeholder="4.5" step="0.1" min="0" max="5" style="flex:2;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+							<input type="number" bind:value={ratings} placeholder="4.5" step="0.1" min="0" max="5" />
 						</div>
 					</div>
 
 					<!-- Created Date -->
-					<div class="filter-group">
-						<span style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.created')}</span>
-						<div class="filter-row" style="display:flex;gap:12px">
-							<select bind:value={createdOp} style="flex:1;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface)">
+					<div class="sr-filter-group">
+						<label for="adv-created-op">{t(lang, 'search.filter.created')}</label>
+						<div class="sr-filter-row">
+							<select id="adv-created-op" bind:value={createdOp}>
 								<option value="after">{t(lang, 'search.operator.after')}</option>
 								<option value="before">{t(lang, 'search.operator.before')}</option>
 							</select>
-							<input type="datetime-local" bind:value={created} style="flex:2;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+							<input type="datetime-local" bind:value={created} />
 						</div>
 					</div>
 
 					<!-- Updated Date -->
-					<div class="filter-group">
-						<span style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.updated')}</span>
-						<div class="filter-row" style="display:flex;gap:12px">
-							<select bind:value={updatedOp} style="flex:1;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface)">
+					<div class="sr-filter-group">
+						<label for="adv-updated-op">{t(lang, 'search.filter.updated')}</label>
+						<div class="sr-filter-row">
+							<select id="adv-updated-op" bind:value={updatedOp}>
 								<option value="after">{t(lang, 'search.operator.after')}</option>
 								<option value="before">{t(lang, 'search.operator.before')}</option>
 							</select>
-							<input type="datetime-local" bind:value={updated} style="flex:2;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+							<input type="datetime-local" bind:value={updated} />
 						</div>
 					</div>
 
 					<!-- Script Language -->
-					<div class="filter-group">
-						<label for="filter-locales" style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.locales')}</label>
-						<select id="filter-locales" name="entry_locales" multiple style="width:100%;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);min-height:120px">
+					<div class="sr-filter-group">
+						<label for="adv-locales">{t(lang, 'search.filter.locales')}</label>
+						<select id="adv-locales" name="entry_locales" multiple size="5">
 							{#each localeOptions as opt}
 								<option value={opt.value}>{opt.label}</option>
 							{/each}
 						</select>
-						<small style="font-size:12px;color:var(--md-sys-color-on-surface-variant);display:block;margin-top:4px">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+						<small class="sr-filter-hint">{t(lang, 'search.locale_options')}</small>
 					</div>
 
 					<!-- Time Zone -->
-					<div class="filter-group">
-						<label for="filter-tz" style="display:block;font-size:13px;font-weight:500;color:var(--md-sys-color-on-surface-variant);margin-bottom:6px">{t(lang, 'search.filter.tz')}</label>
-						<input id="filter-tz" type="text" bind:value={tz} placeholder="Auto-detect (optional)" style="width:100%;padding:10px 14px;border:1px solid var(--md-sys-color-outline-variant);border-radius:var(--md-sys-shape-corner-small);font-family:inherit;font-size:14px;background:var(--md-sys-color-surface-container-highest);color:var(--md-sys-color-on-surface);outline:none" />
+					<div class="sr-filter-group">
+						<label for="adv-tz">{t(lang, 'search.filter.tz')}</label>
+						<input id="adv-tz" type="text" bind:value={tz} placeholder="Auto-detect" />
 					</div>
 
 					<!-- Actions -->
-					<div class="button-group" style="display:flex;gap:12px;padding-top:16px;border-top:1px solid var(--md-sys-color-outline-variant)">
-						<button type="submit" class="md3-button md3-ripple" style="flex:1">{t(lang, 'search.filter.apply')}</button>
-						<button type="button" onclick={clearAdvancedFilters} class="md3-outlined-button md3-ripple" style="flex:1">{t(lang, 'search.filter.clear')}</button>
+					<div class="sr-filter-actions">
+						<button type="submit" class="md3-button">{t(lang, 'search.filter.apply')}</button>
+						<button type="button" onclick={clearAdvancedFilters} class="md3-outlined-button">{t(lang, 'search.filter.clear')}</button>
 					</div>
 				</form>
 			</details>
 		</div>
 
-		<!-- Bottom Ad (en/ja only) -->
+		<!-- Bottom Ad -->
 		{#if shouldShowAds(lang)}
 			<div style="margin-top:24px">
 				<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
@@ -270,3 +259,176 @@
 		{/if}
 	</section>
 </div>
+
+<style>
+	.sr-page {
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+		color: var(--md-sys-color-on-surface);
+	}
+
+	/* ── Basic search card ─────────────────────────────── */
+	.sr-basic-card {
+		background: var(--md-sys-color-surface-container-low);
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-medium);
+		padding: 24px;
+		box-shadow: var(--md-sys-elevation-1);
+	}
+
+	.sr-card-title {
+		margin: 0 0 8px;
+		font-size: var(--md-sys-typescale-title-medium);
+		font-weight: 500;
+	}
+
+	.sr-card-desc {
+		margin: 0;
+		color: var(--md-sys-color-on-surface-variant);
+		font-size: 14px;
+	}
+
+	.sr-input {
+		display: block;
+		width: 100%;
+		max-width: 480px;
+		padding: 10px 16px;
+		border: 1px solid var(--md-sys-color-outline-variant);
+		font-family: inherit;
+		font-size: 14px;
+		background: var(--md-sys-color-surface-container-highest);
+		color: var(--md-sys-color-on-surface);
+		outline: none;
+		transition: border-color var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+	}
+	.sr-input:focus {
+		border-color: var(--md-sys-color-primary);
+	}
+
+	.sr-input--pill {
+		margin-top: 12px;
+		border-radius: var(--md-sys-shape-corner-full);
+	}
+
+	.sr-search-action {
+		margin-top: 20px;
+	}
+
+	/* ── Advanced filters card ─────────────────────────── */
+	.sr-advanced-card {
+		background: var(--md-sys-color-surface-container-low);
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-medium);
+		padding: 20px 24px;
+		margin-top: 24px;
+		box-shadow: var(--md-sys-elevation-1);
+	}
+
+	.sr-advanced-summary {
+		font-size: 16px;
+		font-weight: 500;
+		color: var(--md-sys-color-on-surface);
+		cursor: pointer;
+		user-select: none;
+		padding: 4px 0;
+	}
+
+	.sr-advanced-form {
+		margin-top: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	/* ── Filter groups ─────────────────────────────────── */
+	.sr-filter-group {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.sr-filter-group label {
+		font-size: 13px;
+		font-weight: 500;
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	.sr-filter-row {
+		display: flex;
+		gap: 8px;
+	}
+
+	.sr-filter-row select {
+		width: 90px;
+		flex-shrink: 0;
+		padding: 8px 10px;
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-small);
+		font-family: inherit;
+		font-size: 13px;
+		background: var(--md-sys-color-surface-container-highest);
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.sr-filter-row input {
+		flex: 1;
+		padding: 8px 12px;
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-small);
+		font-family: inherit;
+		font-size: 13px;
+		background: var(--md-sys-color-surface-container-highest);
+		color: var(--md-sys-color-on-surface);
+		outline: none;
+	}
+	.sr-filter-row input:focus,
+	.sr-filter-row select:focus {
+		border-color: var(--md-sys-color-primary);
+	}
+
+	.sr-filter-group > input,
+	.sr-filter-group > select {
+		width: 100%;
+		padding: 8px 12px;
+		border: 1px solid var(--md-sys-color-outline-variant);
+		border-radius: var(--md-sys-shape-corner-small);
+		font-family: inherit;
+		font-size: 13px;
+		background: var(--md-sys-color-surface-container-highest);
+		color: var(--md-sys-color-on-surface);
+		outline: none;
+	}
+	.sr-filter-group > input:focus,
+	.sr-filter-group > select:focus {
+		border-color: var(--md-sys-color-primary);
+	}
+
+	.sr-filter-group select[multiple] {
+		min-height: 120px;
+	}
+
+	.sr-filter-hint {
+		font-size: 12px;
+		color: var(--md-sys-color-on-surface-variant);
+	}
+
+	/* ── Actions ───────────────────────────────────────── */
+	.sr-filter-actions {
+		display: flex;
+		gap: 12px;
+		padding-top: 16px;
+		border-top: 1px solid var(--md-sys-color-outline-variant);
+	}
+	.sr-filter-actions button {
+		flex: 1;
+	}
+
+	/* ── Responsive ────────────────────────────────────── */
+	@media (max-width: 600px) {
+		.sr-filter-row {
+			flex-direction: column;
+		}
+		.sr-filter-row select {
+			width: 100%;
+		}
+	}
+</style>
