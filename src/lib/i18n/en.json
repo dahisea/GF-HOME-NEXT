@@ -140,6 +140,7 @@
 	"info.info_tab": "Info",
 	"info.feedback_tab": "Feedback",
 	"info.source_link": "Source link",
+		"info.proxy_tab": "Compatible Version",
 	"info.notice": "You are accessing mirrored content for accelerated access. GFork cannot guarantee its reliability.",
 	"info.unknown_user": "Unknown user",
 	"info.script_count": "Scripts",

@@ -140,6 +140,7 @@
 	"info.info_tab": "情報",
 	"info.feedback_tab": "フィードバック",
 	"info.source_link": "ソースリンク",
+		"info.proxy_tab": "互換ページ",
 	"info.notice": "加速アクセスのためのミラーコンテンツを表示しています。GForkはその信頼性を保証できません。",
 	"info.unknown_user": "不明なユーザー",
 	"info.script_count": "スクリプト数",

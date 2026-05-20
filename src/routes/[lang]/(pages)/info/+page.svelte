@@ -7,6 +7,7 @@
 
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
+	let gfLocale: string = $derived(i18nConfig.langNames[lang]);
 
 	// ─── Hash route parsing ──────────────────────────────────────────────
 	interface RouteInfo {
@@ -70,10 +71,10 @@
 	function setHashRoute(route: RouteInfo): void {
 		const url = new URL(window.location);
 		if (route.pageType === 'users') {
-			url.hash = `#/${route.locale}/users/${route.userId}`;
+			url.hash = `#/${gfLocale}/users/${route.userId}`;
 		} else {
 			const suffix = route.pageType === 'detail' ? '/detail' : `/${route.pageType}`;
-			url.hash = `#/${route.locale}/scripts/${route.scriptId}${suffix}`;
+			url.hash = `#/${gfLocale}/scripts/${route.scriptId}${suffix}`;
 		}
 		url.search = '';
 		lastValidHash = url.hash;
@@ -217,7 +218,7 @@
 				await loadFeedbackPage(r, signal);
 			} else if (r.pageType === 'redirect') {
 				const url = new URL(window.location);
-				url.hash = `#/${r.locale}/scripts/${r.scriptId}/detail`;
+				url.hash = `#/${gfLocale}/scripts/${r.scriptId}/detail`;
 				url.search = '';
 				window.history.replaceState({}, '', url);
 				lastValidHash = url.hash;
@@ -237,7 +238,7 @@
 
 	async function loadDetailPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
 		activeTab = 'info';
-		const url = `${INFO_API}/${r.locale}/scripts/${r.scriptId}/detail.json`;
+		const url = `${INFO_API}/${gfLocale}/scripts/${r.scriptId}/detail.json`;
 		const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
@@ -250,7 +251,7 @@
 
 		async function loadFeedbackPage(r: RouteInfo, signal: AbortSignal, page = 1): Promise<void> {
 		activeTab = 'feedback';
-			const url = `${INFO_API}/${r.locale}/scripts/${r.scriptId}/feedback.json?page=${page}`;
+			const url = `${INFO_API}/${gfLocale}/scripts/${r.scriptId}/feedback.json?page=${page}`;
 		const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
@@ -279,7 +280,7 @@
 		}
 
 	async function loadUserPage(r: RouteInfo, signal: AbortSignal): Promise<void> {
-		const url = `${INFO_API}/${r.locale}/users/${r.userId}.json`;
+		const url = `${INFO_API}/${gfLocale}/users/${r.userId}.json`;
 		const res = await fetch(url, { headers: { Accept: 'application/json' }, signal });
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
@@ -500,6 +501,9 @@
 					<button class="md3-tab" class:active={activeTab === 'feedback'} onclick={e => { e.preventDefault(); switchTab('feedback'); }}>
 						{t(lang, 'info.feedback_tab')}
 					</button>
+					<a class="md3-tab" href="{siteProxyUrl()}{route.fullPath.replace(/\/detail$/, '')}" target="_blank" rel="noopener noreferrer">
+						{t(lang, 'info.proxy_tab')}
+					</a>
 				</div>
 
 				<!-- Install row -->
@@ -525,12 +529,12 @@
 
 					<!-- Script meta block (from API c2) -->
 					{#if scriptMetaHtml}
-						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={route.locale}>{@html scriptMetaHtml}</div>
+						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={gfLocale}>{@html scriptMetaHtml}</div>
 					{/if}
 
 					<!-- Additional info (from API c3) -->
 					{#if additionalInfoHtml}
-						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={route.locale}>{@html additionalInfoHtml}</div>
+						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={gfLocale}>{@html additionalInfoHtml}</div>
 					{/if}
 
 					{#if !scriptMetaHtml && !additionalInfoHtml}
@@ -541,7 +545,7 @@
 				{:else}
 					<!-- Feedback Tab -->
 					{#if feedbackListHtml}
-						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={route.locale}>{@html feedbackListHtml}</div>
+						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={gfLocale}>{@html feedbackListHtml}</div>
 					{#if feedbackTotalPages > 1}
 						<nav class="if-pagination">
 							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} onclick={() => goToFeedbackPage(1)}>
