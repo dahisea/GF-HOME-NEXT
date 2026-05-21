@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { i18nConfig, type Lang } from '$i18n';
 	import { t } from '$i18n';
 	import { onMount } from 'svelte';
@@ -47,19 +48,19 @@
 	}));
 
 	function switchLang(newLang: Lang) {
-		window.location.href = page.url.pathname.replace(/^\/[^/]+/, `/${newLang}`);
+		goto(page.url.pathname.replace(/^\/[^/]+/, `/${newLang}`));
 	}
 	const isActive = (href: string) => page.url.pathname === href;
 </script>
 
 <header class="m3-nav-header">
 	<nav class="m3-nav-inner">
-		<a href="/{lang}" class="m3-nav-brand">{t(lang, 'site.name')}</a>
+		<a href="/{lang}" class="m3-nav-brand" data-sveltekit-preload-data="hover">{t(lang, 'site.name')}</a>
 
 		<!-- Desktop links -->
 		<div class="m3-nav-links">
 			{#each navItems as item}
-				<a href={item.href} class="m3-nav-link" class:m3-nav-link--active={isActive(item.href)}>
+				<a href={item.href} class="m3-nav-link" class:m3-nav-link--active={isActive(item.href)} data-sveltekit-preload-data="hover">
 					{item.label}
 				</a>
 			{/each}
@@ -159,7 +160,7 @@
 			</div>
 
 			{#each navItems as item}
-				<a href={item.href} class="m3-drawer-item" class:m3-drawer-item--active={isActive(item.href)} onclick={() => mobileOpen = false}>
+				<a href={item.href} class="m3-drawer-item" class:m3-drawer-item--active={isActive(item.href)} onclick={() => mobileOpen = false} data-sveltekit-preload-data="hover">
 					{item.label}
 				</a>
 			{/each}

@@ -69,6 +69,7 @@ interface AdSenseConfig {
     autoRelaxed: string;      homepageAuto: string;
     homepageFluid: string;    redirectAuto: string;
     redirectAutoRelaxed: string;
+    sidebarVert: string;
   };
   fluidLayoutKey: string;
   dnsPrefetch: string[];
@@ -227,6 +228,7 @@ export const siteConfig = {
       homepageFluid:      '1394739154',
       redirectAuto:       '4095096984',
       redirectAutoRelaxed:'3934604756',
+      sidebarVert:        '4497590737',
     },
     fluidLayoutKey: '-gy+2i+5x-ek+82',
     dnsPrefetch: [

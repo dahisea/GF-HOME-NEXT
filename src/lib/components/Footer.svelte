@@ -4,7 +4,8 @@
 	import { i18nConfig } from '$lib/i18n';
 	import AdSense from '$lib/components/AdSense.svelte';
 	import type { Lang } from '$lib/i18n';
-	import { siteConfig, staticUrl } from '$lib/config';
+	import { siteConfig } from '$lib/config';
+	import { goto } from '$app/navigation';
 
 	let { lang, showAds = false }: { lang: Lang; showAds?: boolean } = $props();
 	const year = getCurrentYear();
@@ -14,7 +15,7 @@
 		const selectedOption = select.options[select.selectedIndex];
 		const url = selectedOption.getAttribute('data-language-url');
 		if (url) {
-			window.location.href = url;
+			goto(url);
 		}
 	}
 </script>
@@ -70,7 +71,7 @@
 
 		<!-- Feedback Link -->
 		<p class="m3-footer-meta">
-			<a href="/{lang}/feedback" class="m3-footer-link">
+			<a href="/{lang}/feedback" class="m3-footer-link" data-sveltekit-preload-data="hover">
 				{t(lang, 'footer.feedback')}
 			</a>
 		</p>

@@ -15,6 +15,8 @@
 		responsive?: boolean;
 		/** Additional CSS class. */
 		className?: string;
+		/** Override inline style on the ins element. */
+		insStyle?: string;
 	}
 
 	let {
@@ -23,7 +25,8 @@
 		format = 'auto',
 		layoutKey = '',
 		responsive = true,
-		className = ''
+		className = '',
+		insStyle = 'display:block'
 	}: Props = $props();
 
 	let adRef: HTMLDivElement;
@@ -77,7 +80,7 @@
 >
 	<ins
 		class="adsbygoogle"
-		style="display:block"
+		style={insStyle}
 		data-ad-client={client}
 		data-ad-slot={slot}
 		data-ad-format={format}

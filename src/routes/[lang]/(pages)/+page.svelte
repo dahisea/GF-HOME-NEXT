@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import AdSense from '$components/AdSense.svelte';
 	import { siteConfig, siteUrl, staticUrl, shouldShowAds } from '$lib/config';
@@ -63,7 +64,7 @@
 	<!-- Hero Search Section -->
 	<section class="page-section--centered" style="margin-top:48px;margin-bottom:32px">
 		<h2 class="headline-medium" style="text-align:center;margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
-		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" style="display:flex;justify-content:center">
+		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" style="display:flex;justify-content:center" onsubmit={e => { e.preventDefault(); const fd = new FormData(e.currentTarget as HTMLFormElement); const q = fd.get('q') as string || ''; const sort = fd.get('sort') as string || ''; const fl = fd.get('filter_locale') as string || '0'; let url = `/${lang}/s?q=${encodeURIComponent(q)}`; if (sort) url += `&sort=${encodeURIComponent(sort)}`; if (fl) url += `&filter_locale=${encodeURIComponent(fl)}`; goto(url); }}>
 			<div class="md3-search-bar" style="max-width:560px">
 				<input type="search" name="q" placeholder={t(lang, 'search.placeholder')} required />
 				<input type="hidden" name="sort" value="" />
@@ -94,7 +95,7 @@
 		<section class="text-content" style="text-align:center;font-size:0.8em;color:var(--md-sys-color-on-surface-variant)">
 			<p>
 				{t(lang, 'home.recommend')}
-				<a href="https://www.coolapk.com/link/?url=https://bbs.tampermonkey.net.cn/forum.php" target="_blank">{t(lang, 'home.recommend.link1')}</a>
+				<a href="https://www.coolapk.com/link/?url=https://bbs.tampermonkey.net.cn/forum.php" target="_blank" rel="noopener noreferrer">{t(lang, 'home.recommend.link1')}</a>
 				{t(lang, 'home.recommend.link2')}
 			</p>
 		</section>
@@ -128,10 +129,10 @@
 	<section class="text-content" style="text-align:center">
 		<div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
 			<span>{t(lang, 'home.tos_agree')}</span>
-			<a href="/{lang}/tos" target="_blank" class="md3-tonal-button md3-ripple">{t(lang, 'home.tos_link')}</a>
+			<a href="/{lang}/tos" class="md3-tonal-button md3-ripple" data-sveltekit-preload-data="hover">{t(lang, 'home.tos_link')}</a>
 		</div>
 		<div style="margin-top:16px">
-			<a href="/{lang}/installing" class="md3-tonal-button md3-ripple">{t(lang, 'home.installing_link')}</a>
+			<a href="/{lang}/installing" class="md3-tonal-button md3-ripple" data-sveltekit-preload-data="hover">{t(lang, 'home.installing_link')}</a>
 		</div>
 	</section>
 </div>

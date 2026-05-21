@@ -2,8 +2,9 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
-	import { siteConfig, getPrimaryLookupNodes, getBackupLookupNodes } from '$lib/config';
+	import { siteConfig, getPrimaryLookupNodes, getBackupLookupNodes, shouldShowAds } from '$lib/config';
 	import { sendAudit } from '$lib/audit';
+	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -302,14 +303,14 @@
 
 		setHashParams(newParams);
 		syncFromHash();
-		window.open(window.location.href, '_blank');
+		doSearch();
 	}
 
 	function clearFilters(): void {
 		const p = { q: query, page: currentPage !== '1' ? currentPage : undefined };
 		setHashParams(p);
 		syncFromHash();
-		window.open(window.location.href, '_blank');
+		doSearch();
 	}
 
 	function handleSearch(e: Event): void {
@@ -322,21 +323,21 @@
 		if (p.site) newParams.site = p.site;
 		setHashParams(newParams);
 		syncFromHash();
-		window.open(window.location.href, '_blank');
+		doSearch();
 	}
 
 	function handleSort(value: string): void {
 		const newParams = { ...getSearchParams(), sort: value };
 		setHashParams(newParams);
 		syncFromHash();
-		window.open(window.location.href, '_blank');
+		doSearch();
 	}
 
 	function handleLangFilter(value: string): void {
 		const newParams = { ...getSearchParams(), filter_locale: value };
 		setHashParams(newParams);
 		syncFromHash();
-		window.open(window.location.href, '_blank');
+		doSearch();
 	}
 
 	function formatDateTime(raw: string): string {
@@ -608,7 +609,7 @@
 							<li class="lk-result-item" style="animation: lk-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 								<article>
 									<h2>
-										<a class="lk-script-link" href={getScriptInfoUrl(script)} target="_blank" rel="noopener noreferrer">
+										<a class="lk-script-link" href={getScriptInfoUrl(script)}>
 											{script.name || t(lang, 'lookup.unnamed')}
 										</a>
 										<span class="lk-badge-js" title="User Script">JS</span>
@@ -618,16 +619,27 @@
 									<div class="lk-script-meta">
 										<dl class="lk-stats">
 											<dt>{t(lang, 'lookup.author')}</dt>
-											<dd><a href={getAuthorUrl(script)} target="_blank" rel="noopener noreferrer">{escapeHtml(script.users?.[0]?.name || t(lang, 'lookup.unknown_author'))}</a></dd>
+											<dd><a href={getAuthorUrl(script)}>{escapeHtml(script.users?.[0]?.name || t(lang, 'lookup.unknown_author'))}</a></dd>
 											<dt>{t(lang, 'lookup.daily_installs')}</dt>
 											<dd>{script.daily_installs || 0}</dd>
 											<dt>{t(lang, 'lookup.total_installs')}</dt>
 											<dd>{script.total_installs || 0}</dd>
 											<dt>{t(lang, 'lookup.ratings')}</dt>
 											<dd class="lk-ratings-cell" data-rating-score={script.fan_score || 0}>
-												<span class="lk-good" title={t(lang, 'lookup.ratings_good')}>{script.good_ratings || 0}</span>
-												<span class="lk-ok" title={t(lang, 'lookup.ratings_ok')}>{script.ok_ratings || 0}</span>
-												<span class="lk-bad" title={t(lang, 'lookup.ratings_bad')}>{script.bad_ratings || 0}</span>
+												{@const g = script.good_ratings || 0}
+												{@const o = script.ok_ratings || 0}
+												{@const b = script.bad_ratings || 0}
+												{@const total = g + o + b}
+												<span class="lk-good" title={t(lang, 'lookup.ratings_good')}>{g}</span>
+												<span class="lk-ok" title={t(lang, 'lookup.ratings_ok')}>{o}</span>
+												<span class="lk-bad" title={t(lang, 'lookup.ratings_bad')}>{b}</span>
+												{#if total > 0}
+													<span class="lk-rating-bar">
+														<span class="lk-rating-bar-good" style="width:{(g / total * 100).toFixed(1)}%"></span>
+														<span class="lk-rating-bar-ok" style="width:{(o / total * 100).toFixed(1)}%"></span>
+														<span class="lk-rating-bar-bad" style="width:{(b / total * 100).toFixed(1)}%"></span>
+													</span>
+												{/if}
 											</dd>
 											<dt>{t(lang, 'lookup.created')}</dt>
 											<dd>{formatDateTime(script.created_at)}</dd>
@@ -645,19 +657,31 @@
 						{/each}
 					</ol>
 
+					{#if shouldShowAds(lang) && results.length > 3}
+						<div style="margin:16px 0">
+							<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+						</div>
+					{/if}
+
 					<!-- Pagination -->
 					{@const pageNum = parseInt(currentPage) || 1}
 					<div class="lk-pagination">
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: '1' }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.first')}</a>
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(Math.max(pageNum - 1, 1)) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.prev')}</a>
+						<button class="md3-outlined-button" disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}" onclick={() => { const p = { ...getSearchParams(), page: '1' }; setHashParams(p); syncFromHash(); doSearch(); }}>{t(lang, 'lookup.pagination.first')}</button>
+						<button class="md3-outlined-button" disabled={pageNum === 1} style="opacity:{pageNum === 1 ? '0.4' : '1'}" onclick={() => { const p = { ...getSearchParams(), page: String(Math.max(pageNum - 1, 1)) }; setHashParams(p); syncFromHash(); doSearch(); }}>{t(lang, 'lookup.pagination.prev')}</button>
 						<span class="lk-current-page">{pageNum}</span>
-						<a href={null} onclick={e => { e.preventDefault(); setHashParams({ ...getSearchParams(), page: String(pageNum + 1) }); window.open(window.location.href, '_blank'); }} class="md3-outlined-button" class:disabled={results.length < 25} style="opacity:{results.length < 25 ? '0.4' : '1'}">{t(lang, 'lookup.pagination.next')}</a>
+						<button class="md3-outlined-button" disabled={results.length < 25} style="opacity:{results.length < 25 ? '0.4' : '1'}" onclick={() => { const p = { ...getSearchParams(), page: String(pageNum + 1) }; setHashParams(p); syncFromHash(); doSearch(); }}>{t(lang, 'lookup.pagination.next')}</button>
 					</div>
 				{/if}
 
 				<div class="lk-warning-bar">
 					{t(lang, 'lookup.warning')}
 				</div>
+
+				{#if shouldShowAds(lang)}
+					<div style="margin:16px 0">
+						<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>
@@ -850,6 +874,20 @@
 	.lk-ratings-cell .lk-ok { color: #ff9800; margin: 0 4px; }
 	.lk-ratings-cell .lk-bad { color: var(--md-sys-color-error); }
 
+	.lk-rating-bar {
+		display: inline-flex;
+		width: 80px;
+		height: 6px;
+		border-radius: 3px;
+		overflow: hidden;
+		margin-left: 8px;
+		vertical-align: middle;
+	}
+
+	.lk-rating-bar-good { background: #4caf50; height: 100%; display: inline-block; }
+	.lk-rating-bar-ok   { background: #ff9800; height: 100%; display: inline-block; }
+	.lk-rating-bar-bad  { background: var(--md-sys-color-error); height: 100%; display: inline-block; }
+
 	.lk-install-area { margin-top: 12px; }
 
 	/* ─── Pagination ──────────────────────────────────── */
@@ -858,7 +896,7 @@
 		gap: 8px; margin-top: 20px; padding: 12px 0;
 		font-size: 13px;
 	}
-	.lk-pagination a.disabled { pointer-events: none; }
+	.lk-pagination button:disabled { pointer-events: none; opacity: 0.4; }
 	.lk-current-page {
 		padding: 6px 14px; font-weight: 600;
 		color: var(--md-sys-color-on-surface);

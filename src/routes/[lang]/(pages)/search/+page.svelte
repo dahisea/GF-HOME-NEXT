@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig, shouldShowAds } from '$lib/config';
 	import AdSense from '$components/AdSense.svelte';
@@ -29,11 +30,16 @@
 
 	// ─── Basic search form ─────────────────────────────────────────────
 	function handleBasicSubmit(e: Event) {
+		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const siteInput = form.querySelector<HTMLInputElement>('[name="site"]');
 		if (siteInput && !siteInput.value.trim()) {
 			siteInput.disabled = true;
 		}
+		const fd = new FormData(form);
+		const qs = new URLSearchParams();
+		fd.forEach((v, k) => { if (v && typeof v === 'string') qs.set(k, v); });
+		goto(`/${lang}/s?${qs.toString()}`);
 	}
 
 	// ─── Advanced filter state ─────────────────────────────────────────

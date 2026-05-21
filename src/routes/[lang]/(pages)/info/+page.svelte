@@ -2,7 +2,8 @@
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
-	import { siteConfig, siteProxyUrl } from '$lib/config';
+	import { siteConfig, siteProxyUrl, shouldShowAds } from '$lib/config';
+	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -35,11 +36,11 @@
 		if (!path) return null;
 
 		const patterns: { regex: RegExp; pageType: RouteInfo['pageType'] }[] = [
-			{ regex: /^([a-z]{2}(?:-[A-Z]{2})?)\/scripts\/(\d+)(?:-[^/]+)?\/detail$/, pageType: 'detail' },
-			{ regex: /^([a-z]{2}(?:-[A-Z]{2})?)\/scripts\/(\d+)(?:-[^/]+)?\/feedback$/, pageType: 'feedback' },
-			{ regex: /^([a-z]{2}(?:-[A-Z]{2})?)\/scripts\/(\d+)(?:-[^/]+)?\/(code|versions|stats)$/, pageType: 'redirect' },
-			{ regex: /^([a-z]{2}(?:-[A-Z]{2})?)\/scripts\/(\d+)(?:-[^/]+)?$/, pageType: 'redirect' },
-			{ regex: /^([a-z]{2}(?:-[A-Z]{2})?)\/users\/(.+)$/, pageType: 'users' }
+			{ regex: /^([a-z]{2}(?:-[A-Za-z]{2,})?)\/scripts\/(\d+)(?:-[^/]+)?\/detail$/, pageType: 'detail' },
+			{ regex: /^([a-z]{2}(?:-[A-Za-z]{2,})?)\/scripts\/(\d+)(?:-[^/]+)?\/feedback$/, pageType: 'feedback' },
+			{ regex: /^([a-z]{2}(?:-[A-Za-z]{2,})?)\/scripts\/(\d+)(?:-[^/]+)?\/(code|versions|stats)$/, pageType: 'redirect' },
+			{ regex: /^([a-z]{2}(?:-[A-Za-z]{2,})?)\/scripts\/(\d+)(?:-[^/]+)?$/, pageType: 'redirect' },
+			{ regex: /^([a-z]{2}(?:-[A-Za-z]{2,})?)\/users\/(.+)$/, pageType: 'users' }
 		];
 
 		for (const { regex, pageType } of patterns) {
@@ -120,6 +121,7 @@
 
 	// detail
 	let scriptTitle = $state('');
+	let scriptHeaderHtml = $state('');
 	let scriptMetaHtml = $state('');
 	let additionalInfoHtml = $state('');
 	let installLink = $state('');
@@ -145,17 +147,16 @@
 			if (a.hasAttribute('data-processed')) return;
 			const href = a.getAttribute('href');
 			if (!href) return;
-			// Skip already absolute/external URLs
+			// Skip already absolute/external URLs and internal anchors
 			if (href.startsWith('http://') || href.startsWith('https://') ||
 				href.startsWith('javascript:') || href.startsWith('mailto:') ||
-				href.startsWith('tel:') || href.includes('?') || href.includes('#')) return;
+				href.startsWith('tel:') || href.startsWith('#')) return;
 
 			// User profile links → internal info page
 			const userMatch = href.match(/\/users\/([^/?]+)/);
 			if (userMatch) {
 				a.setAttribute('href', `#/${locale}/users/${userMatch[1]}`);
 				a.setAttribute('data-processed', 'true');
-				if (!a.hasAttribute('target')) a.setAttribute('target', '_blank');
 				return;
 			}
 
@@ -164,7 +165,6 @@
 			if (siteMatch) {
 				a.setAttribute('href', `/${lang}/lookup#?site=${siteMatch[1]}`);
 				a.setAttribute('data-processed', 'true');
-				if (!a.hasAttribute('target')) a.setAttribute('target', '_blank');
 				return;
 			}
 
@@ -179,8 +179,39 @@
 		});
 	}
 
+	function processFeedbackLinks(container: HTMLElement, locale: string): void {
+		const discussionList = container.querySelector('.script-discussion-list');
+		const target = discussionList || container;
+		target.querySelectorAll('a[href]').forEach((a) => {
+			if (a.hasAttribute('data-processed')) return;
+			const href = a.getAttribute('href');
+			if (!href) return;
+			if (href.startsWith('http://') || href.startsWith('https://') ||
+				href.startsWith('?')) return;
+
+			// User profile links → internal info page
+			const userMatch = href.match(/\/users\/([^/?]+)/);
+			if (userMatch) {
+				a.setAttribute('href', `#/${locale}/users/${userMatch[1]}`);
+				a.setAttribute('data-processed', 'true');
+				return;
+			}
+
+			// Discussion links and other relative paths → compatible mirror
+			const proxy = siteProxyUrl();
+			a.setAttribute('href', proxy + (href.startsWith('/') ? href : '/' + href));
+			a.setAttribute('data-processed', 'true');
+			if (!a.hasAttribute('target')) a.setAttribute('target', '_blank');
+		});
+	}
+
 	function processLinks(node: HTMLElement, locale: string): { destroy(): void } {
-		tick().then(() => processAllLinks(node, locale));
+		tick().then(() => {
+			if (node.id === 'feedback-list' || node.classList.contains('if-gf-feedback')) {
+				processFeedbackLinks(node, locale);
+			}
+			processAllLinks(node, locale);
+		});
 		return { destroy() {} };
 	}
 
@@ -243,6 +274,7 @@
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		scriptTitle = json.title || '';
+		scriptHeaderHtml = decodeBase64(json.c1);
 		scriptMetaHtml = decodeBase64(json.c2);
 		additionalInfoHtml = decodeBase64(json.c3);
 		installLink = json.install || '';
@@ -314,26 +346,14 @@
 			if (document.hidden && abortController) abortController.abort();
 		});
 
-		document.addEventListener('click', (e) => {
-			const a = (e.target as Element).closest('a[href]');
-			if (!a) return;
-			const href = a.getAttribute('href');
-			if (href && href.startsWith('#') && href !== '#' && href !== '#google_vignette') {
-				if (!a.hasAttribute('target')) {
-					e.preventDefault();
-					window.open(a.href, '_blank');
-				}
-			}
-		}, true);
-
 		const observer = new MutationObserver((mutations) => {
 			for (const m of mutations) {
 				if (m.type === 'childList') {
 					m.addedNodes.forEach((node) => {
 						if (node.nodeType === Node.ELEMENT_NODE) {
 							const el = node as HTMLElement;
-							if (el.tagName === 'A') processAllLinks(el.parentElement, lang);
-							else if (el.querySelectorAll) processAllLinks(el, lang);
+							if (el.tagName === 'A') processAllLinks(el.parentElement, gfLocale);
+							else if (el.querySelectorAll) processAllLinks(el, gfLocale);
 						}
 					});
 				}
@@ -341,7 +361,7 @@
 					const el = m.target as HTMLElement;
 					if (el.tagName === 'A') {
 						el.removeAttribute('data-processed');
-						processAllLinks(el.parentElement, lang);
+						processAllLinks(el.parentElement, gfLocale);
 					}
 				}
 			}
@@ -385,7 +405,7 @@
 		if (!route) return;
 		const newRoute = { ...route, pageType: tab === 'info' ? 'detail' as const : 'feedback' as const };
 		setHashRoute(newRoute);
-		window.open(window.location.href, '_blank');
+		loadContent(newRoute);
 	}
 </script>
 
@@ -408,7 +428,7 @@
 				<span class="material-icons" style="font-size:48px;color:var(--md-sys-color-error)">error_outline</span>
 				<h3 class="title-large" style="margin:12px 0">{t(lang, 'info.error')}</h3>
 				<p style="color:var(--md-sys-color-on-surface-variant);margin-bottom:20px">{error}</p>
-				<button onclick={() => window.location.reload()} class="md3-button">{t(lang, 'info.retry')}</button>
+				<button onclick={() => { error = ''; if (route) loadContent(route); else initPage(); }} class="md3-button">{t(lang, 'info.retry')}</button>
 			</div>
 		{:else if userData}
 			<!-- User page -->
@@ -430,6 +450,27 @@
 						<dd>{formatDateTime(userData.created_at || '')}</dd>
 					</dl>
 				</header>
+
+				{#if userData.bio}
+					<div class="if-user-bio" style="color:var(--md-sys-color-on-surface-variant);font-size:14px;line-height:1.6;margin-bottom:16px;padding:12px 16px;background:var(--md-sys-color-surface-container-low);border-radius:var(--md-sys-shape-corner-small)">
+						{escapeHtml(userData.bio)}
+					</div>
+				{/if}
+
+				{#if userData.github_identities && userData.github_identities.length > 0}
+					<div class="if-user-github" style="margin-bottom:16px;font-size:13px">
+						<span style="color:var(--md-sys-color-on-surface-variant)">GitHub: </span>
+						{#each userData.github_identities as gh}
+							{#if gh.url}
+								<a href={gh.url} target="_blank" rel="noopener noreferrer" style="color:var(--md-sys-color-primary);text-decoration:none">{gh.name}</a>
+							{:else}
+								<span style="color:var(--md-sys-color-on-surface-variant)">{gh.name}</span>
+							{/if}
+							{@sep}, {/sep}
+						{/each}
+					</div>
+				{/if}
+
 				<div>
 					<h3 class="title-large" style="margin-bottom:16px">{t(lang, 'info.scripts')}</h3>
 					{#if userData.scripts && userData.scripts.filter(s => !s.deleted).length > 0}
@@ -438,7 +479,7 @@
 								<li class="if-result-item" style="animation: if-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 									<article>
 										<h2>
-											<a class="if-script-link" href={`#/${route?.locale || i18nConfig.langNames[lang]}/scripts/${script.id}/detail`} target="_blank" rel="noopener noreferrer">
+											<a class="if-script-link" href={`#/${route?.locale || i18nConfig.langNames[lang]}/scripts/${script.id}/detail`}>
 												{script.name || t(lang, 'info.unnamed')}
 											</a>
 											<span class="if-badge-js">JS</span>
@@ -469,7 +510,7 @@
 													{@const dl = `/${lang}/l#/` + script.code_url.replace('https://update.greasyfork.org/scripts/', '')}
 													<a href={dl} class="md3-button" target="_blank" rel="noopener noreferrer">{t(lang, 'info.install')}</a>
 												{:else}
-													<a href={null} class="md3-button" target="_blank" rel="noopener noreferrer">{t(lang, 'info.install')}</a>
+													<a href="/{lang}/installing" class="md3-button">{t(lang, 'info.install')}</a>
 												{/if}
 											</div>
 										</div>
@@ -522,24 +563,32 @@
 
 				<!-- Info Tab -->
 				{#if activeTab === 'info'}
-					<!-- Script title (from API, shown above meta) -->
-					{#if scriptTitle}
+					<!-- Script header (from API c1 — name + description) -->
+					{#if scriptHeaderHtml}
+						<div class="if-content-area if-gf-header" id="script-header" use:processLinks={gfLocale}>{@html scriptHeaderHtml}</div>
+					{:else if scriptTitle}
 						<h2 class="if-script-page-title">{scriptTitle}</h2>
 					{/if}
 
-					<!-- Script meta block (from API c2) -->
+					<!-- Script meta block (from API c2 — stats: author, installs, ratings, version, dates, license, sites) -->
 					{#if scriptMetaHtml}
 						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={gfLocale}>{@html scriptMetaHtml}</div>
 					{/if}
 
-					<!-- Additional info (from API c3) -->
+					<!-- Additional info (from API c3 — user-generated content: description, screenshots, about) -->
 					{#if additionalInfoHtml}
 						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={gfLocale}>{@html additionalInfoHtml}</div>
 					{/if}
 
-					{#if !scriptMetaHtml && !additionalInfoHtml}
+					{#if !scriptHeaderHtml && !scriptMetaHtml && !additionalInfoHtml}
 						<div class="md3-card if-no-content">
 							<p>{t(lang, 'info.no_description')}</p>
+						</div>
+					{/if}
+
+					{#if shouldShowAds(lang)}
+						<div style="margin-top:16px">
+							<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
 						</div>
 					{/if}
 				{:else}
@@ -563,6 +612,12 @@
 							{/if}
 						</nav>
 					{/if}
+					{/if}
+
+					{#if shouldShowAds(lang)}
+						<div style="margin-top:16px">
+							<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+						</div>
 					{/if}
 				{/if}
 			</section>
@@ -705,6 +760,24 @@
 	   Greasy Fork HTML fragment styles
 	   These match the original GF look within our MD3 theme
 	   =================================================== */
+
+	/* ── Header block (c1) ─────────────────────────────── */
+	.if-gf-header {
+		font-size: 14px;
+		line-height: 1.6;
+	}
+
+	.if-gf-header :global(h2) {
+		font-size: var(--md-sys-typescale-headline-medium);
+		font-weight: 500;
+		margin: 0 0 8px;
+		color: var(--md-sys-color-on-surface);
+	}
+
+	.if-gf-header :global(p.script-description) {
+		color: var(--md-sys-color-on-surface-variant);
+		margin: 0;
+	}
 
 	/* ── Meta block (c2) ─────────────────────────────── */
 	.if-gf-meta :global(.script-meta-block) {
@@ -897,7 +970,8 @@
 	.if-gf-content :global(.install-link),
 	.if-gf-content :global(.install-help-link),
 	.if-gf-content :global(dialog),
-	.if-gf-meta :global(dialog) {
+	.if-gf-meta :global(dialog),
+	.if-gf-header :global(dialog) {
 		display: none !important;
 	}
 
@@ -910,7 +984,99 @@
 	.if-gf-feedback :global(.script-discussion-list) {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 0;
+	}
+
+	.if-gf-feedback :global(.discussion-list-container) {
+		border-bottom: 1px solid var(--md-sys-color-outline-variant);
+	}
+
+	.if-gf-feedback :global(.discussion-list-item) {
+		padding: 16px 4px;
+		transition: background var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
+	}
+
+	.if-gf-feedback :global(.discussion-list-item:hover) {
+		background: var(--md-sys-color-surface-container-low);
+	}
+
+	.if-gf-feedback :global(.discussion-meta) {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 16px;
+		margin-bottom: 6px;
+		font-size: 13px;
+	}
+
+	.if-gf-feedback :global(.discussion-meta-item) {
+		color: var(--md-sys-color-on-surface-variant);
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+	}
+
+	.if-gf-feedback :global(.discussion-title) {
+		display: flex;
+		align-items: flex-start;
+		gap: 8px;
+		color: var(--md-sys-color-on-surface);
+		text-decoration: none;
+		font-size: 14px;
+		line-height: 1.5;
+		word-break: break-word;
+	}
+
+	.if-gf-feedback :global(.discussion-title:hover) {
+		color: var(--md-sys-color-primary);
+	}
+
+	.if-gf-feedback :global(.rating-icon) {
+		flex-shrink: 0;
+		width: 24px;
+		height: 24px;
+		border-radius: var(--md-sys-shape-corner-full);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 12px;
+		font-weight: 600;
+		color: #fff;
+		margin-top: 2px;
+		text-indent: -9999px;
+		overflow: hidden;
+	}
+
+	.if-gf-feedback :global(.rating-icon-good) { background: #4caf50; }
+	.if-gf-feedback :global(.rating-icon-ok)   { background: #ff9800; }
+	.if-gf-feedback :global(.rating-icon-bad)  { background: var(--md-sys-color-error); }
+
+	.if-gf-feedback :global(.discussion-snippet) {
+		color: var(--md-sys-color-on-surface-variant);
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+	}
+
+	.if-gf-feedback :global(.user-link) {
+		color: var(--md-sys-color-primary);
+		text-decoration: none;
+		font-weight: 500;
+	}
+
+	.if-gf-feedback :global(.user-link:hover) {
+		text-decoration: underline;
+	}
+
+	.if-gf-feedback :global(.badge-author) {
+		background: var(--md-sys-color-primary-container);
+		color: var(--md-sys-color-on-primary-container);
+		padding: 1px 8px;
+		border-radius: var(--md-sys-shape-corner-full);
+		font-size: 11px;
+		font-weight: 600;
 	}
 
 	.if-gf-feedback :global(.discussion) {

@@ -326,7 +326,7 @@
 						{/each}
 					</div>
 				{/if}
-				<a href={finalUrl} class="dl-btn"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
+				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
 				<div class="dl-progress-bar"><div class="dl-progress-fill ok" style="width:100%"></div></div>
 			{/if}
 
@@ -336,7 +336,7 @@
 				<h1>{t(lang, 'download.error')}</h1>
 				<p class="dl-desc">{errorMsg || '所有节点检测超时, 已随机选择一个节点'}</p>
 				<div class="dl-url">{finalUrl}</div>
-				<a href={finalUrl} class="dl-btn"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
+				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
 				<div class="dl-tip">若无法访问, 请重新整理再试</div>
 			{/if}
 		</div>
