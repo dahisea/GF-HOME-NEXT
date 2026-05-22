@@ -579,6 +579,12 @@
 						</form>
 					</details>
 				</div>
+
+				{#if shouldShowAds(lang)}
+					<div style="margin-top:16px;text-align:center">
+						<AdSense slot={siteConfig.adsense.slots.sidebarVert} format="auto" insStyle="display:inline-block;width:190px;height:570px" />
+					</div>
+				{/if}
 			</aside>
 
 			<!-- Main content -->
@@ -606,6 +612,11 @@
 				{:else if results.length > 0}
 					<ol class="lk-script-list">
 						{#each results as script, i (script.id)}
+							{#if i > 0 && i % 5 === 0 && shouldShowAds(lang)}
+								<li class="lk-ad-item" style="display:flex;justify-content:center;padding:16px 0">
+									<div style="width:100%;max-width:672px"><AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} /></div>
+								</li>
+							{/if}
 							<li class="lk-result-item" style="animation: lk-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 								<article>
 									<h2>

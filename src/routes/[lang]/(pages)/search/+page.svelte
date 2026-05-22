@@ -162,6 +162,13 @@
 			</div>
 		</form>
 
+		<!-- Mid Ad (fluid in-feed) -->
+		{#if shouldShowAds(lang)}
+			<div style="margin:16px 0">
+				<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+			</div>
+		{/if}
+
 		<!-- ── Advanced Filters ────────────────────────────────────── -->
 		<div class="sr-advanced-card">
 			<details open>

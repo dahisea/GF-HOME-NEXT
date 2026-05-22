@@ -125,6 +125,13 @@
 		{/if}
 	</section>
 
+	<!-- Mid Ad (auto-relaxed) -->
+	{#if shouldShowAds(lang)}
+		<section class="text-content" style="text-align:center">
+			<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+		</section>
+	{/if}
+
 	<!-- TOS & Installing Links -->
 	<section class="text-content" style="text-align:center">
 		<div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">

@@ -575,6 +575,12 @@
 						<div class="if-content-area if-gf-meta" id="script-meta" use:processLinks={gfLocale}>{@html scriptMetaHtml}</div>
 					{/if}
 
+					{#if shouldShowAds(lang) && additionalInfoHtml}
+						<div style="margin:0 0 16px;text-align:center">
+							<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+						</div>
+					{/if}
+
 					<!-- Additional info (from API c3 — user-generated content: description, screenshots, about) -->
 					{#if additionalInfoHtml}
 						<div class="if-content-area if-gf-content" id="additional-info" use:processLinks={gfLocale}>{@html additionalInfoHtml}</div>
