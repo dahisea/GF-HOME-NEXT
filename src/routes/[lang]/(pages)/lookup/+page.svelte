@@ -530,19 +530,19 @@
 						<summary class="lk-advanced-summary">{t(lang, 'lookup.sidebar_advanced')}</summary>
 						<form class="lk-advanced-form" onsubmit={applyFilter}>
 							<div class="lk-filter-group">
-								<input name="site" placeholder={t(lang, 'lookup.filter_site_placeholder')} />
+								<input name="site" placeholder={t(lang, 'lookup.filter_site_placeholder')} value={advancedParams.site || ''} />
 							</div>
 
 							{#each numericFilters as filter}
 								<div class="lk-filter-group">
 									<label for="{filter.key}_operator">{t(lang, filter.labelKey)}:</label>
 									<div class="lk-filter-row">
-										<select id="{filter.key}_operator" name="{filter.key}_operator">
+										<select id="{filter.key}_operator" name="{filter.key}_operator" value={advancedParams[filter.key + '_operator'] || 'gt'}>
 											<option value="gt">{t(lang, 'lookup.operator.gt')}</option>
 											<option value="lt">{t(lang, 'lookup.operator.lt')}</option>
 											<option value="eq">{t(lang, 'lookup.operator.eq')}</option>
 										</select>
-										<input type={filter.type} name={filter.key} placeholder={t(lang, 'lookup.filter_value_placeholder')} step={filter.step || ''} />
+										<input type={filter.type} name={filter.key} placeholder={t(lang, 'lookup.filter_value_placeholder')} step={filter.step || ''} value={advancedParams[filter.key] || ''} />
 									</div>
 								</div>
 							{/each}
@@ -551,18 +551,18 @@
 								<div class="lk-filter-group">
 									<label for="{filter.key}_operator">{t(lang, filter.labelKey)}:</label>
 									<div class="lk-filter-row">
-										<select id="{filter.key}_operator" name="{filter.key}_operator">
+										<select id="{filter.key}_operator" name="{filter.key}_operator" value={advancedParams[filter.key + '_operator'] || 'gt'}>
 											<option value="gt">{t(lang, 'lookup.operator.after')}</option>
 											<option value="lt">{t(lang, 'lookup.operator.before')}</option>
 										</select>
-										<input type="datetime-local" name={filter.key} />
+										<input type="datetime-local" name={filter.key} value={advancedParams[filter.key] || ''} />
 									</div>
 								</div>
 							{/each}
 
 							<div class="lk-filter-group">
 								<label for="entry_locales">{t(lang, 'lookup.filter_script_lang')}:</label>
-								<select name="entry_locales[]" multiple size="5" id="entry_locales">
+								<select name="entry_locales[]" multiple size="5" id="entry_locales" value={advancedParams['entry_locales[]'] || []}>
 									{#each localeOptions as loc}
 										<option value={loc.value}>{loc.label}</option>
 									{/each}
