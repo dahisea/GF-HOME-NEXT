@@ -120,10 +120,54 @@
 	</noscript>
 {/if}
 
-<main style="min-height: var(--md-sys-layout-min-height, calc(100vh - 3.5rem - 8rem))">
-	{@render children()}
-</main>
+<div class="m3-layout-body">
+	<main>
+		{@render children()}
+	</main>
+
+	{#if showAds && !hideChrome}
+		<aside class="m3-sidebar-ad">
+			<ins class="adsbygoogle ads-firstscreen"
+				style="display:inline-block;width:190px;height:570px"
+				data-ad-client={adClient}
+				data-ad-slot={siteConfig.adsense.slots.sidebarVert}></ins>
+			<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+		</aside>
+	{/if}
+</div>
 
 {#if !hideChrome}
 <Footer {lang} {showAds} />
 {/if}
+
+<style>
+	.m3-layout-body {
+		max-width: 1160px;
+		margin: 0 auto;
+		padding: 0 var(--md-sys-layout-side-margin, 16px);
+		display: flex;
+		gap: 24px;
+	}
+
+	.m3-layout-body main {
+		min-width: 0;
+		flex: 1 1 auto;
+		min-height: var(--md-sys-layout-min-height, calc(100vh - 3.5rem - 8rem));
+	}
+
+	.m3-sidebar-ad {
+		flex-shrink: 0;
+		width: 190px;
+		padding-top: 24px;
+	}
+
+	.m3-sidebar-ad .ads-firstscreen {
+		position: sticky;
+		top: 88px;
+	}
+
+	@media (max-width: 899px) {
+		.m3-sidebar-ad { display: none; }
+		.m3-layout-body { padding: 0; }
+	}
+</style>
