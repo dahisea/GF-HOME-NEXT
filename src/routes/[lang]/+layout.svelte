@@ -49,6 +49,7 @@
 
 	let cleanPath: string = $derived(page.url.pathname.replace(/^\/[^/]+/, '') || '/');
 	let hideChrome: boolean = $derived(/^\/(s|l)(\/|$)/.test(cleanPath));
+	let hideSidebar: boolean = $derived(/^\/(lookup|info)\b/.test(cleanPath));
 	let adClient = siteConfig.adsense.publisherId;
 	let gtmId = siteConfig.adsense.gtmId;
 	let adPrefetchDomains = siteConfig.adsense.dnsPrefetch;
@@ -125,13 +126,27 @@
 		{@render children()}
 	</main>
 
-	{#if showAds && !hideChrome}
+	{#if showAds && !hideChrome && !hideSidebar}
 		<aside class="m3-sidebar-ad">
-			<ins class="adsbygoogle ads-firstscreen"
-				style="display:inline-block;width:190px;height:570px"
-				data-ad-client={adClient}
-				data-ad-slot={siteConfig.adsense.slots.sidebarVert}></ins>
-			<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+			<div class="m3-sidebar-ad-inner">
+				<!-- Vertical sidebar ad (first-screen, instant load) -->
+				<ins class="adsbygoogle ads-firstscreen"
+					style="display:inline-block;width:190px;height:570px"
+					data-ad-client={adClient}
+					data-ad-slot={siteConfig.adsense.slots.sidebarVert}></ins>
+				<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+
+				<!-- Second auto-responsive ad -->
+				<div style="margin-top:24px">
+					<ins class="adsbygoogle"
+						style="display:block"
+						data-ad-client={adClient}
+						data-ad-slot={siteConfig.adsense.slots.generic}
+						data-ad-format="auto"
+						data-full-width-responsive="true"></ins>
+					<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+				</div>
+			</div>
 		</aside>
 	{/if}
 </div>
@@ -158,12 +173,15 @@
 	.m3-sidebar-ad {
 		flex-shrink: 0;
 		width: 190px;
-		padding-top: 24px;
 	}
 
-	.m3-sidebar-ad .ads-firstscreen {
+	.m3-sidebar-ad-inner {
 		position: sticky;
 		top: 88px;
+		padding-top: 24px;
+		display: flex;
+		flex-direction: column;
+		gap: 0;
 	}
 
 	@media (max-width: 899px) {

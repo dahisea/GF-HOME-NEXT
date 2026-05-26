@@ -245,6 +245,9 @@
 		<div class="content-wrapper" style="margin-bottom:16px">
 			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
 		</div>
+		<div class="content-wrapper" style="margin-bottom:16px">
+			<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+		</div>
 	{/if}
 
 	<div class="content-wrapper">
@@ -260,6 +263,9 @@
 						? '使用方式: 在URL后加上 ?path=your-script-path.user.js'
 						: '使用方式: 在URL后加上 #/your-script-path.user.js'}
 				</div>
+				{#if shouldShowAds(lang)}
+					<div style="margin-top:16px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+				{/if}
 			{/if}
 
 			<!-- fetching-ip -->
@@ -268,6 +274,9 @@
 				<h1>{t(lang, 'download.title')}</h1>
 				<p class="dl-desc">{progressText}</p>
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
+				{#if shouldShowAds(lang)}
+					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+				{/if}
 			{/if}
 
 			<!-- checking-cache / init -->
@@ -286,6 +295,9 @@
 					<div class="dl-tip">提示: 缓存有效期 {DLC.cacheDays} 天{#if userIP} (IP: {userIP}){/if}</div>
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
+				{#if shouldShowAds(lang)}
+					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} /></div>
+				{/if}
 			{/if}
 
 			<!-- testing -->
@@ -309,6 +321,9 @@
 					{/each}
 				</div>
 				<div class="dl-tip">提示: 正在随机测试 {selectedDomains.length} 个节点</div>
+				{#if shouldShowAds(lang)}
+					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 			{/if}
 
@@ -321,6 +336,9 @@
 					<div class="dl-badge"><span class="material-icons">speed</span>最低延迟 {bestLatency.toFixed(0)}ms</div>
 				{/if}
 				<div class="dl-url">{finalUrl}</div>
+				{#if shouldShowAds(lang)}
+					<div style="margin:12px 0"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+				{/if}
 				{#if testResults.length > 0}
 					<div class="dl-st">
 						<div class="dl-st-t">测速结果</div>
@@ -343,6 +361,9 @@
 				<h1>{t(lang, 'download.error')}</h1>
 				<p class="dl-desc">{errorMsg || '所有节点检测超时, 已随机选择一个节点'}</p>
 				<div class="dl-url">{finalUrl}</div>
+				{#if shouldShowAds(lang)}
+					<div style="margin:12px 0"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+				{/if}
 				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
 				<div class="dl-tip">若无法访问, 请重新整理再试</div>
 			{/if}
@@ -350,6 +371,12 @@
 	</div>
 
 	{#if shouldShowAds(lang)}
+		<div class="content-wrapper" style="margin-top:16px">
+			<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+		</div>
+		<div class="content-wrapper" style="margin-top:16px">
+			<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+		</div>
 		<div class="content-wrapper" style="margin-top:16px">
 			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
 		</div>
