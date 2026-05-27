@@ -641,14 +641,14 @@
 											<dd>{script.total_installs || 0}</dd>
 											<dt>{t(lang, 'lookup.ratings')}</dt>
 											<dd class="lk-ratings-cell" data-rating-score={script.fan_score || 0}>
-												{@const g = script.good_ratings || 0}
-												{@const o = script.ok_ratings || 0}
-												{@const b = script.bad_ratings || 0}
-												{@const total = g + o + b}
-												<span class="lk-good" title={t(lang, 'lookup.ratings_good')}>{g}</span>
-												<span class="lk-ok" title={t(lang, 'lookup.ratings_ok')}>{o}</span>
-												<span class="lk-bad" title={t(lang, 'lookup.ratings_bad')}>{b}</span>
-												{#if total > 0}
+												<span class="lk-good" title={t(lang, 'lookup.ratings_good')}>{script.good_ratings || 0}</span>
+												<span class="lk-ok" title={t(lang, 'lookup.ratings_ok')}>{script.ok_ratings || 0}</span>
+												<span class="lk-bad" title={t(lang, 'lookup.ratings_bad')}>{script.bad_ratings || 0}</span>
+												{#if (script.good_ratings || 0) + (script.ok_ratings || 0) + (script.bad_ratings || 0) > 0}
+													{@const g = script.good_ratings || 0}
+													{@const o = script.ok_ratings || 0}
+													{@const b = script.bad_ratings || 0}
+													{@const total = g + o + b}
 													<span class="lk-rating-bar">
 														<span class="lk-rating-bar-good" style="width:{(g / total * 100).toFixed(1)}%"></span>
 														<span class="lk-rating-bar-ok" style="width:{(o / total * 100).toFixed(1)}%"></span>

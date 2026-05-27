@@ -468,13 +468,13 @@
 				{#if userData.github_identities && userData.github_identities.length > 0}
 					<div class="if-user-github" style="margin-bottom:16px;font-size:13px">
 						<span style="color:var(--md-sys-color-on-surface-variant)">GitHub: </span>
-						{#each userData.github_identities as gh}
+						{#each userData.github_identities as gh, i}
 							{#if gh.url}
 								<a href={gh.url} target="_blank" rel="noopener noreferrer" style="color:var(--md-sys-color-primary);text-decoration:none">{gh.name}</a>
 							{:else}
 								<span style="color:var(--md-sys-color-on-surface-variant)">{gh.name}</span>
 							{/if}
-							{@sep}, {/sep}
+							{#if i < userData.github_identities.length - 1}, {/if}
 						{/each}
 					</div>
 				{/if}
