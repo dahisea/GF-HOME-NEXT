@@ -16,9 +16,9 @@
 	<title>404 - {siteConfig.name}</title>
 </svelte:head>
 
-<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--md-sys-color-surface, #f8faf0);color:var(--md-sys-color-on-surface, #1a1c18);text-align:center">
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--md-sys-color-surface, #fffaf0);color:var(--md-sys-color-on-surface, #1e1b13);text-align:center">
 	<h1 style="font-size:72px;font-weight:200;color:var(--md-sys-color-primary, #705d00);margin:0">404</h1>
-	<p style="font-size:var(--md-sys-typescale-headline-medium);color:var(--md-sys-color-on-surface-variant, #52433f)">Page Not Found</p>
+	<p style="font-size:var(--md-sys-typescale-headline-medium);color:var(--md-sys-color-on-surface-variant, #4b4634)">Page Not Found</p>
 
 	<div style="width:100%;max-width:600px">
 		<!-- Ad: autorelaxed -->
@@ -35,7 +35,7 @@
 	</a>
 
 	<!-- Sponsor -->
-	<p style="margin-top:40px;font-size:14px;color:var(--md-sys-color-on-surface-variant, #52433f)">
+	<p style="margin-top:40px;font-size:14px;color:var(--md-sys-color-on-surface-variant, #4b4634)">
 		Sponsored by <a href={siteConfig.sponsor.url} target="_blank" rel="noopener noreferrer" style="color:var(--md-sys-color-primary, #705d00)">{siteConfig.sponsor.name}</a>
 	</p>
 	<a href={siteConfig.sponsor.url} target="_blank" rel="noopener noreferrer">
