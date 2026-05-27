@@ -1,7 +1,7 @@
 /**
  * Theme store — Svelte 5 runes, shared module state.
  *
- * Manages both theme (light/dark/system) and color-scheme (forest/ocean/...)
+ * Manages both theme (light/dark/system) and color-scheme (yellow/ocean/...)
  * localStorage keys:
  *   "gf-theme" → "system" | "light" | "dark"
  *   "gf-color" → scheme id (string, defaults to first scheme)
