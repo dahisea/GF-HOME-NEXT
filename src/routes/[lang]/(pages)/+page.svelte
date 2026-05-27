@@ -2,7 +2,6 @@
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
-	import AdSense from '$components/AdSense.svelte';
 	import { siteConfig, shouldShowAds } from '$lib/config';
 	import type { PageData } from './$types';
 
@@ -41,7 +40,8 @@
 	<!-- ═══ AD: Top banner (above everything) ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-top:16px">
-			slot=siteConfig.adsense.slots.auto
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 
@@ -65,7 +65,7 @@
 	<!-- ═══ AD: Below search bar ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -79,7 +79,7 @@
 	<!-- ═══ AD: After intro ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -98,7 +98,7 @@
 	<!-- ═══ AD: After ScriptCat ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -106,7 +106,8 @@
 	<!-- ═══ AD: Before URL tool ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			slot=siteConfig.adsense.slots.auto
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 
@@ -130,7 +131,7 @@
 	<!-- ═══ AD: After URL tool ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -138,7 +139,7 @@
 	<!-- ═══ AD: auto fluid ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -157,10 +158,11 @@
 	<!-- ═══ AD: Bottom ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:32px">
-			slot=siteConfig.adsense.slots.auto
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 		<div style="text-align:center;margin-bottom:32px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}

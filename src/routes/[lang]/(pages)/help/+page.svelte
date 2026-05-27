@@ -105,7 +105,7 @@
 
 	{#if showAds}
 		<div style="margin-top:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}

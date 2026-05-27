@@ -16,7 +16,7 @@
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">
 	{#if shouldShowAds(lang)}
 		<div class="text-content" style="margin-bottom:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -101,7 +101,7 @@
 
 	{#if shouldShowAds(lang)}
 		<div class="text-content" style="margin-top:24px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}

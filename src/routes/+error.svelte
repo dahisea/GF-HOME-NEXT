@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<script async src="{siteConfig.cdn.adsenseScript}?client={siteConfig.adsense.publisherId}" crossorigin="anonymous"></script>
+	<script async src="https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js?client=ca-pub-3758644447684310" crossorigin="anonymous"></script>
 	<title>404 - {siteConfig.name}</title>
 </svelte:head>
 
@@ -24,8 +24,8 @@
 		<!-- Ad: autorelaxed -->
 		<ins class="adsbygoogle"
 			style="display:block"
-			data-ad-client={siteConfig.adsense.publisherId}
-			data-ad-slot={siteConfig.adsense.slots.autorelaxed}
+			data-ad-client="3044"
+			data-ad-slot="3934604756"
 			data-ad-format="autorelaxed">
 		</ins>
 	</div>
@@ -46,8 +46,8 @@
 	<div style="width:100%;max-width:600px;margin-top:24px">
 		<ins class="adsbygoogle"
 			style="display:block"
-			data-ad-client={siteConfig.adsense.publisherId}
-			data-ad-slot={siteConfig.adsense.slots.auto}
+			data-ad-client="3044"
+			data-ad-slot="4095096984"
 			data-ad-format="auto"
 			data-full-width-responsive="true">
 		</ins>

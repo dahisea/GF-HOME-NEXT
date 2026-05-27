@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { t } from '$lib/i18n';
 	import { getCurrentYear } from '$lib/utils';
 	import { i18nConfig } from '$lib/i18n';
@@ -45,7 +45,7 @@
 		<!-- AdSense (only on ad-enabled locales) -->
 		{#if showAds}
 			<div class="m3-footer-ad">
-				<ins class="adsbygoogle" style="display:block" data-ad-client={siteConfig.adsense.publisherId} data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
+				<ins class="adsbygoogle" style="display:block" data-ad-client="3044" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
 				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 			</div>
 		{/if}

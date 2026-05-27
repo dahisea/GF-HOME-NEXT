@@ -50,7 +50,6 @@
 	let cleanPath: string = $derived(page.url.pathname.replace(/^\/[^/]+/, '') || '/');
 	let hideChrome: boolean = $derived(/^\/(s|l)(\/|$)/.test(cleanPath));
 	let hideSidebar: boolean = $derived(/^\/(lookup|info)\b/.test(cleanPath));
-	let adClient = siteConfig.adsense.publisherId;
 	let gtmId = siteConfig.adsense.gtmId;
 	let adPrefetchDomains = siteConfig.adsense.dnsPrefetch;
 	let cdnStatic = $derived(siteConfig.cdn.enabled ? siteConfig.cdn.static : '');
@@ -98,8 +97,8 @@
 	<link rel="alternate" hreflang="x-default" href={siteConfig.url + '/' + i18nConfig.defaultLang + cleanPath} />
 
 	<!-- AdSense & GTM scripts — loaded once per page, only on ad-enabled locales -->
-	{#if showAds && adClient && !hideChrome}
-		<script async src="{siteConfig.cdn.adsenseScript}?client={adClient}" crossorigin="anonymous"></script>
+	{#if showAds && !hideChrome}
+		<script async src="https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js?client=ca-pub-3758644447684310" crossorigin="anonymous"></script>
 	{/if}
 	{#if showAds && gtmId && !hideChrome}
 		{@html '(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({"' + "gtm.start" + '":new Date().getTime(),event:"gtm.js"});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src="https://www.googletagmanager.com/gtm.js?id=' + gtmId + '";f.parentNode.insertBefore(j,f);})(window,document,"script","dataLayer","' + gtmId + '");'}
@@ -128,16 +127,16 @@
 				<!-- Vertical sidebar ad (first-screen, instant load) -->
 				<ins class="adsbygoogle ads-firstscreen"
 					style="display:inline-block;width:190px;height:570px"
-					data-ad-client={adClient}
-					data-ad-slot={siteConfig.adsense.slots.sidebar}></ins>
+					data-ad-client="ca-pub-3758644447684310"
+					data-ad-slot="4497590737"></ins>
 				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 
 				<!-- Second auto-responsive ad -->
 				<div style="margin-top:24px">
 					<ins class="adsbygoogle"
 						style="display:block"
-						data-ad-client={adClient}
-						data-ad-slot={siteConfig.adsense.slots.auto}
+						data-ad-client="ca-pub-3758644447684310"
+						data-ad-slot="4095096984"
 						data-ad-format="auto"
 						data-full-width-responsive="true"></ins>
 					{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}

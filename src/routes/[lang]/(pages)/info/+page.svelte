@@ -577,7 +577,7 @@
 
 					{#if shouldShowAds(lang) && additionalInfoHtml}
 						<div style="margin:0 0 16px;text-align:center">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}
@@ -623,7 +623,7 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}

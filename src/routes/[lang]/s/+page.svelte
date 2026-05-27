@@ -1,6 +1,4 @@
 ﻿<script lang="ts">
-	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig } from '$lib/config';
 	import type { PageData } from './$types';
@@ -8,71 +6,44 @@
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	let targetUrl = $state(`/${lang}/lookup`);
-	let countdown = $state(siteConfig.redirects.searchDelaySec);
-	let waitText = $derived(t(lang, 'redirect.waiting').replace('{countdown}', String(countdown)));
-	let skipText = $derived(t(lang, 'redirect.skip'));
-
-	onMount(() => {
-		const searchParams = new URLSearchParams(window.location.search);
-		let hashParams = new URLSearchParams();
-		const hash = window.location.hash;
-		if (hash && hash.startsWith('#?')) {
-			hashParams = new URLSearchParams(hash.substring(2));
-		}
-
-		const merged = new URLSearchParams();
-		for (const [k, v] of searchParams) { if (v) merged.set(k, v); }
-		for (const [k, v] of hashParams) { if (v) merged.set(k, v); }
-
-		const qs = merged.toString();
-		if (qs) targetUrl = `/${lang}/lookup#?${qs}`;
-
-		try {
-			const w = window as unknown as Record<string, unknown>;
-			const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
-			if (!w.adsbygoogle) w.adsbygoogle = q;
-			q.push({});
-			q.push({});
-			q.push({});
-		} catch { /* ad blocked */ }
-
-		const timer = setInterval(() => {
-			countdown--;
-			if (countdown <= 0) {
-				clearInterval(timer);
-				goto(targetUrl);
-			}
-		}, 1000);
-
-		const fallbackMs = (siteConfig.redirects.searchDelaySec + 3) * 1000;
-		const fallback = setTimeout(() => {
-			clearInterval(timer);
-			window.location.href = targetUrl;
-		}, fallbackMs);
-
-		return () => { clearInterval(timer); clearTimeout(fallback); };
-	});
+	let targetUrl = `/${lang}/lookup`;
+	let delaySec = siteConfig.redirects.searchDelaySec;
+	let waitText = t(lang, 'redirect.waiting').replace('{countdown}', String(delaySec));
+	let skipText = t(lang, 'redirect.skip');
 </script>
 
 <svelte:head>
-	<script async src="{siteConfig.cdn.adsenseScript}?client={siteConfig.adsense.publisherId}" crossorigin="anonymous"></script>
+	<script async src="https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js?client=ca-pub-3758644447684310" crossorigin="anonymous"></script>
 	<noscript>
-		<meta http-equiv="refresh" content="6;url={targetUrl}" />
+		<meta http-equiv="refresh" content="{delaySec + 3};url={targetUrl}" />
 	</noscript>
 	<title>{t(lang, 'redirect.title')}</title>
 </svelte:head>
 
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--md-sys-color-surface, #f8faf0);color:var(--md-sys-color-on-surface, #1a1c18)">
-	<p style="font-size:14px;color:var(--md-sys-color-on-surface-variant, #42483c);margin-bottom:8px">{waitText}</p>
+	<p id="redirect-countdown-text" style="font-size:14px;color:var(--md-sys-color-on-surface-variant, #42483c);margin-bottom:8px">{waitText}</p>
 
 	<div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px">
-		<ins class="adsbygoogle" style="display:block" data-ad-client={siteConfig.adsense.publisherId} data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
-		<ins class="adsbygoogle" style="display:block" data-ad-client={siteConfig.adsense.publisherId} data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
-		<ins class="adsbygoogle" style="display:block" data-ad-client={siteConfig.adsense.publisherId} data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 	</div>
 
-	<p style="margin-top:24px">
+	<p id="redirect-skip" style="margin-top:24px">
 		<a href={targetUrl} style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary, #386b20);color:var(--md-sys-color-on-primary, #fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">{skipText}</a>
 	</p>
 </div>
+
+{@html `<script>
+(function(){
+	var d=` + delaySec + `;
+	var u='` + targetUrl + `';
+	var wt='` + waitText.replace("'", "\\'") + `';
+	var st='` + skipText.replace("'", "\\'") + `';
+	(function(){var s=new URLSearchParams(window.location.search),h=new URLSearchParams(),x=window.location.hash;if(x&&x.startsWith('#?'))h=new URLSearchParams(x.substring(2));var m=new URLSearchParams();for(var kv of s){if(kv[1])m.set(kv[0],kv[1])}for(var kv of h){if(kv[1])m.set(kv[0],kv[1])}var q=m.toString();if(q)u='` + '/' + lang + '/lookup' + `#?'+q;})();
+	document.getElementById('redirect-skip').innerHTML='<a href="'+u+'" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary,#386b20);color:var(--md-sys-color-on-primary,#fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">'+st+'</a>';
+	(function(){try{var w=window,q=w.adsbygoogle||[];if(!w.adsbygoogle)w.adsbygoogle=q;q.push({});q.push({});q.push({});}catch(e){}})();
+	var t=d,e=document.getElementById('redirect-countdown-text');
+	var z=setInterval(function(){t--;if(t<=0){clearInterval(z);window.location.href=u;}else{e.textContent=wt.replace('{countdown}',t);}},1000);
+	setTimeout(function(){clearInterval(z);window.location.href=u;},(d+3)*1000);
+})();<\/script>`}

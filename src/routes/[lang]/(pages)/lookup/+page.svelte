@@ -582,7 +582,7 @@
 
 				{#if shouldShowAds(lang)}
 					<div style="margin-top:16px;text-align:center">
-						<AdSense slot={siteConfig.adsense.slots.sidebar} format="" insStyle="display:inline-block;width:190px;height:570px" />
+						<AdSense slot="4497590737" format="" insStyle="display:inline-block;width:190px;height:570px" />
 					</div>
 					<div style="margin-top:24px;text-align:center">
 						slot=siteConfig.adsense.slots.auto
@@ -617,7 +617,7 @@
 						{#each results as script, i (script.id)}
 							{#if i > 0 && i % 5 === 0 && shouldShowAds(lang)}
 								<li class="lk-ad-item" style="display:flex;justify-content:center;padding:16px 0">
-									<div style="width:100%;max-width:672px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+									<div style="width:100%;max-width:672px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
 								</li>
 							{/if}
@@ -674,7 +674,7 @@
 
 					{#if shouldShowAds(lang) && results.length > 3}
 						<div style="margin:16px 0">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}

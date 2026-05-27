@@ -244,7 +244,7 @@
 			slot=siteConfig.adsense.slots.auto
 		</div>
 		<div class="content-wrapper" style="margin-bottom:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
@@ -295,7 +295,7 @@
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
 				{/if}
 			{/if}
@@ -372,11 +372,11 @@
 
 	{#if shouldShowAds(lang)}
 		<div class="content-wrapper" style="margin-top:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
 {@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
