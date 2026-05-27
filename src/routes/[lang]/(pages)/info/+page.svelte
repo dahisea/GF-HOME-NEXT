@@ -603,7 +603,8 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							slot=siteConfig.adsense.slots.auto
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}
 				{:else}

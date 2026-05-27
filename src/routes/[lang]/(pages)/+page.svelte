@@ -1,6 +1,5 @@
 ﻿<script lang="ts">
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig, shouldShowAds } from '$lib/config';
 	import type { PageData } from './$types';
@@ -48,7 +47,7 @@
 	<!-- ═══ Hero Search Section ═══ -->
 	<section style="margin-top:48px;margin-bottom:24px;text-align:center">
 		<h2 class="headline-medium" style="margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
-		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" style="display:flex;justify-content:center" onsubmit={e => { e.preventDefault(); const fd = new FormData(e.currentTarget as HTMLFormElement); const q = fd.get('q') as string || ''; const sort = fd.get('sort') as string || ''; const fl = fd.get('filter_locale') as string || '0'; let url = `/${lang}/s?q=${encodeURIComponent(q)}`; if (sort) url += `&sort=${encodeURIComponent(sort)}`; if (fl) url += `&filter_locale=${encodeURIComponent(fl)}`; goto(url); }}>
+		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" target="_blank" style="display:flex;justify-content:center" onsubmit={e => { const fd = new FormData(e.currentTarget as HTMLFormElement); const q = fd.get('q') as string || ''; const sort = fd.get('sort') as string || ''; const fl = fd.get('filter_locale') as string || '0'; let url = `/${lang}/s?q=${encodeURIComponent(q)}`; if (sort) url += `&sort=${encodeURIComponent(sort)}`; if (fl) url += `&filter_locale=${encodeURIComponent(fl)}`; (e.currentTarget as HTMLFormElement).action = url; }}>
 			<div class="md3-search-bar">
 				<input type="search" name="q" placeholder={t(lang, 'search.placeholder')} required />
 				<input type="hidden" name="sort" value="" />

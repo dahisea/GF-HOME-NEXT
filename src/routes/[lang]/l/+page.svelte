@@ -1,4 +1,5 @@
 ﻿<script lang="ts">
+	import { onMount } from 'svelte';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig } from '$lib/config';
 	import type { PageData } from './$types';
@@ -6,10 +7,57 @@
 	let { data }: { data: PageData } = $props();
 	let lang: Lang = $derived(data.lang);
 
-	let targetUrl = `/${lang}/download`;
 	let delaySec = siteConfig.redirects.downloadDelaySec;
-	let waitText = t(lang, 'redirect.waiting').replace('{countdown}', String(delaySec));
+	let waitTemplate = t(lang, 'redirect.waiting');
 	let skipText = t(lang, 'redirect.skip');
+	let baseUrl = `/${lang}/download`;
+
+	onMount(() => {
+		let countdown = delaySec;
+		let targetUrl = baseUrl;
+		const meta = document.createElement('meta');
+		meta.httpEquiv = 'refresh';
+		meta.id = 'redirect-meta';
+		document.head.appendChild(meta);
+		const textEl = document.getElementById('redirect-countdown-text')!;
+		const skipEl = document.getElementById('redirect-skip')!;
+
+		function buildUrl() {
+			const hash = window.location.hash;
+			targetUrl = window.location.origin + '/' + lang + '/download' + (hash && hash.indexOf('#/') === 0 ? hash : '');
+		}
+
+		function update() {
+			buildUrl();
+			meta.content = countdown + ';url=' + targetUrl;
+			skipEl.innerHTML = '<button onclick="location.reload()" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary,#7f3300);color:var(--md-sys-color-on-primary,#fff);border:none;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer">' + skipText + '</button>';
+		}
+
+		function tick() {
+			countdown--;
+			if (countdown <= 0) { clearInterval(interval); return; }
+			update();
+			textEl.textContent = waitTemplate.replace('{countdown}', String(countdown));
+		}
+
+		buildUrl();
+		update();
+		window.addEventListener('hashchange', update);
+		textEl.textContent = waitTemplate.replace('{countdown}', String(countdown));
+		const interval = setInterval(tick, 1000);
+
+		try {
+			const w = window as unknown as Record<string, unknown>;
+			const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
+			if (!w.adsbygoogle) w.adsbygoogle = q;
+			q.push({}); q.push({}); q.push({});
+		} catch (e) { /* ad blocked */ }
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener('hashchange', update);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -18,7 +66,7 @@
 </svelte:head>
 
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--md-sys-color-surface, #fff8f6);color:var(--md-sys-color-on-surface, #201a17)">
-	<p id="redirect-countdown-text" style="font-size:14px;color:var(--md-sys-color-on-surface-variant, #52443c);margin-bottom:8px">{waitText}</p>
+	<p id="redirect-countdown-text" style="font-size:14px;color:var(--md-sys-color-on-surface-variant, #52443c);margin-bottom:8px">{waitTemplate.replace('{countdown}', String(delaySec))}</p>
 
 	<div style="width:100%;max-width:400px;display:flex;flex-direction:column;gap:16px">
 		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -27,42 +75,6 @@
 	</div>
 
 	<p id="redirect-skip" style="margin-top:24px">
-		<a href={targetUrl} style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary, #7f3300);color:var(--md-sys-color-on-primary, #fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">{skipText}</a>
+		<button onclick={() => location.reload()} style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary, #7f3300);color:var(--md-sys-color-on-primary, #fff);border:none;border-radius:999px;text-decoration:none;font-size:14px;font-weight:500;cursor:pointer">{skipText}</button>
 	</p>
 </div>
-
-{@html `<script>
-(function(){
-	var d=` + delaySec + `;
-	var u='` + targetUrl + `';
-	var wt='` + waitText.replace(/'/g, "\\'") + `';
-	var st='` + skipText.replace(/'/g, "\\'") + `';
-	var meta=document.createElement('meta');
-	meta.httpEquiv='refresh';
-	meta.id='redirect-meta';
-	document.head.appendChild(meta);
-
-	var e=document.getElementById('redirect-countdown-text');
-	var s=document.getElementById('redirect-skip');
-	var t=d;
-	var z;
-
-	function buildUrl(){
-		var x=window.location.hash;
-		u=window.location.origin+'` + '/' + lang + '/download' + `'+(x&&x.startsWith('#/')?x:'');
-	}
-	function update(){
-		buildUrl();
-		meta.content=t+';url='+u;
-		s.innerHTML='<a href="'+u+'" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary,#7f3300);color:var(--md-sys-color-on-primary,#fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">'+st+'</a>';
-	}
-	function tick(){t--;if(t<=0){clearInterval(z)}else{update();e.textContent=wt.replace('{countdown}',t)}}
-
-	buildUrl();
-	update();
-	window.addEventListener('hashchange',update);
-	e.textContent=wt.replace('{countdown}',t);
-	z=setInterval(tick,1000);
-
-	(function(){try{var w=window,q=w.adsbygoogle||[];if(!w.adsbygoogle)w.adsbygoogle=q;q.push({});q.push({});q.push({});}catch(e){}})();
-})();<\/script>`}

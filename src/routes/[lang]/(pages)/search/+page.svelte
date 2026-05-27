@@ -1,10 +1,8 @@
 ﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig, shouldShowAds } from '$lib/config';
-	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -30,7 +28,6 @@
 
 	// ─── Basic search form ─────────────────────────────────────────────
 	function handleBasicSubmit(e: Event) {
-		e.preventDefault();
 		const form = e.target as HTMLFormElement;
 		const siteInput = form.querySelector<HTMLInputElement>('[name="site"]');
 		if (siteInput && !siteInput.value.trim()) {
@@ -39,7 +36,7 @@
 		const fd = new FormData(form);
 		const qs = new URLSearchParams();
 		fd.forEach((v, k) => { if (v && typeof v === 'string') qs.set(k, v); });
-		goto(`/${lang}/s?${qs.toString()}`);
+		form.action = `/${lang}/s?${qs.toString()}`;
 	}
 
 	// ─── Advanced filter state ─────────────────────────────────────────
@@ -129,11 +126,12 @@
 	<section class="sr-page">
 		<!-- Top Ad -->
 		{#if shouldShowAds(lang)}
-			slot=siteConfig.adsense.slots.auto
+		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		{/if}
 
 		<!-- ── Basic Search ────────────────────────────────────────── -->
-		<form class="sr-basic-card" action="/{lang}/s" accept-charset="UTF-8" method="get" onsubmit={handleBasicSubmit}>
+		<form class="sr-basic-card" action="/{lang}/s" accept-charset="UTF-8" method="get" target="_blank" onsubmit={handleBasicSubmit}>
 			<h3 class="sr-card-title">{t(lang, 'search.script_search_title')}</h3>
 			<p class="sr-card-desc">{t(lang, 'search.script_search_desc')}</p>
 			<p class="sr-card-desc">{t(lang, 'search.enter_keywords')}</p>

@@ -1,7 +1,55 @@
 ﻿<script lang="ts">
+	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
 
 	let delaySec = siteConfig.redirects.downloadDelaySec;
+
+	onMount(() => {
+		let countdown = delaySec;
+		let targetUrl = '/en/download';
+		const meta = document.createElement('meta');
+		meta.httpEquiv = 'refresh';
+		meta.id = 'redirect-meta';
+		document.head.appendChild(meta);
+		const textEl = document.getElementById('redirect-countdown-text')!;
+		const skipEl = document.getElementById('redirect-skip')!;
+
+		function buildUrl() {
+			const hash = window.location.hash;
+			targetUrl = window.location.origin + '/en/download' + (hash && hash.indexOf('#/') === 0 ? hash : '');
+		}
+
+		function update() {
+			buildUrl();
+			meta.content = countdown + ';url=' + targetUrl;
+			skipEl.innerHTML = '<button onclick="location.reload()" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary,#7f3300);color:var(--md-sys-color-on-primary,#fff);border:none;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer">Click here if not redirected</button>';
+		}
+
+		function tick() {
+			countdown--;
+			if (countdown <= 0) { clearInterval(interval); return; }
+			update();
+			textEl.textContent = 'Redirecting in ' + countdown + 's...';
+		}
+
+		buildUrl();
+		update();
+		window.addEventListener('hashchange', update);
+		textEl.textContent = 'Redirecting in ' + countdown + 's...';
+		const interval = setInterval(tick, 1000);
+
+		try {
+			const w = window as unknown as Record<string, unknown>;
+			const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
+			if (!w.adsbygoogle) w.adsbygoogle = q;
+			q.push({}); q.push({}); q.push({});
+		} catch (e) { /* ad blocked */ }
+
+		return () => {
+			clearInterval(interval);
+			window.removeEventListener('hashchange', update);
+		};
+	});
 </script>
 
 <svelte:head>
@@ -19,40 +67,6 @@
 	</div>
 
 	<p id="redirect-skip" style="margin-top:24px">
-		<a href="/en/download" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary, #7f3300);color:var(--md-sys-color-on-primary, #fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">Click here if not redirected</a>
+		<button onclick={() => location.reload()} style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary, #7f3300);color:var(--md-sys-color-on-primary, #fff);border:none;border-radius:999px;text-decoration:none;font-size:14px;font-weight:500;cursor:pointer">Click here if not redirected</button>
 	</p>
 </div>
-
-{@html `<script>
-(function(){
-	var d=` + delaySec + `;
-	var u='/en/download';
-	var meta=document.createElement('meta');
-	meta.httpEquiv='refresh';
-	meta.id='redirect-meta';
-	document.head.appendChild(meta);
-
-	var e=document.getElementById('redirect-countdown-text');
-	var s=document.getElementById('redirect-skip');
-	var t=d;
-	var z;
-
-	function buildUrl(){
-		var x=window.location.hash;
-		u=window.location.origin+'/en/download'+(x&&x.startsWith('#/')?x:'');
-	}
-	function update(){
-		buildUrl();
-		meta.content=t+';url='+u;
-		s.innerHTML='<a href="'+u+'" style="display:inline-block;padding:12px 32px;background:var(--md-sys-color-primary,#7f3300);color:var(--md-sys-color-on-primary,#fff);border-radius:999px;text-decoration:none;font-size:14px;font-weight:500">Click here if not redirected</a>';
-	}
-	function tick(){t--;if(t<=0){clearInterval(z)}else{update();e.textContent='Redirecting in '+t+'s...'}}
-
-	buildUrl();
-	update();
-	window.addEventListener('hashchange',update);
-	e.textContent='Redirecting in '+t+'s...';
-	z=setInterval(tick,1000);
-
-	(function(){try{var w=window,q=w.adsbygoogle||[];if(!w.adsbygoogle)w.adsbygoogle=q;q.push({});q.push({});q.push({});}catch(e){}})();
-})();<\/script>`}

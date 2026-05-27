@@ -319,11 +319,10 @@
 		const q = (form.querySelector('input[name="q"]') as HTMLInputElement)?.value?.trim();
 		if (!q) return;
 		const p = getSearchParams();
-		const newParams: SearchParams = { q, sort: p.sort || '', filter_locale: p.filter_locale || '0' };
-		if (p.site) newParams.site = p.site;
-		setHashParams(newParams);
-		syncFromHash();
-		doSearch();
+		const ps = new URLSearchParams({ q, sort: p.sort || '', filter_locale: p.filter_locale || '0' });
+		if (p.site) ps.set('site', p.site);
+		form.action = `/${lang}/lookup#?${ps.toString()}`;
+		form.submit();
 	}
 
 	function handleSort(value: string): void {
@@ -480,7 +479,7 @@
 			<aside class="lk-sidebar" class:open={sidebarOpen}>
 				<div class="lk-sidebar-title">{t(lang, 'lookup.sidebar_title')}</div>
 
-				<form class="lk-sidebar-search" onsubmit={handleSearch}>
+				<form class="lk-sidebar-search" target="_blank" onsubmit={handleSearch}>
 					<input
 						type="search"
 						name="q"
@@ -585,7 +584,8 @@
 						<AdSense slot="4497590737" format="" insStyle="display:inline-block;width:190px;height:570px" />
 					</div>
 					<div style="margin-top:24px;text-align:center">
-						slot=siteConfig.adsense.slots.auto
+						<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 					</div>
 				{/if}
 			</aside>
@@ -695,7 +695,8 @@
 
 				{#if shouldShowAds(lang)}
 					<div style="margin:16px 0">
-						slot=siteConfig.adsense.slots.auto
+						<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 					</div>
 				{/if}
 			</div>
