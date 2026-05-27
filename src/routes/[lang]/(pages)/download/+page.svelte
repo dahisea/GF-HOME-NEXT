@@ -131,23 +131,6 @@
 		document.head.appendChild(meta);
 	}
 
-	// ─── Auto-fallback timer ───
-	let fallbackTimer: ReturnType<typeof setTimeout>;
-	function startFallbackTimer() {
-		if (fallbackTimer) clearTimeout(fallbackTimer);
-		fallbackTimer = setTimeout(() => {
-			if (stage === 'no-path' || stage === 'fallback' || stage === 'success') return;
-			// fallback: pick random domain and redirect
-			const domains = getDownloadDomains();
-			const fb = domains[Math.floor(Math.random() * domains.length)]!;
-			bestDomain = fb;
-			finalUrl = `${fb}/scripts/${scriptPath}`;
-			errorMsg = '检测超时, 请稍后重试';
-			stage = 'fallback';
-			updateProgress(0, '超时');
-		}, DLC.autoFallbackMs);
-	}
-
 	// ─── Main flow ───
 	async function run() {
 		const path = getScriptPath();
@@ -222,13 +205,12 @@
 			finalUrl = `${fb}/scripts/${scriptPath}`;
 			stage = 'fallback';
 			updateProgress(100, '使用备用方案');
+			redirectWithMeta(finalUrl, 1);
 		}
 	}
 
 	onMount(() => {
-		startFallbackTimer();
 		run();
-		return () => { if (fallbackTimer) clearTimeout(fallbackTimer); };
 	});
 </script>
 
