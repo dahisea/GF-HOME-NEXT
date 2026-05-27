@@ -153,6 +153,7 @@
 	"info.unnamed": "未命名",
 	"info.unknown_author": "未知作者",
 	"info.generic_error": "加載失敗",
+	"info.error_502": "後端伺服器暫不可用，1秒後自動跳轉相容版頁面：{mirror}",
 	"info.no_feedback": "暫無反饋信息",
 	"help.title": "幫助",
 	"help.usage_title": "使用",

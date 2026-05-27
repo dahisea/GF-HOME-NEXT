@@ -260,7 +260,15 @@
 			}
 		} catch (e) {
 			if ((e as Error).name !== 'AbortError') {
-				error = `${t(lang, 'info.generic_error')}: ${(e as Error).message || ''}`;
+				const msg = (e as Error).message || '';
+				if (msg.includes('502') && route) {
+					errorKey = 'info.generic_error';
+					const mirrorUrl = siteProxyUrl() + route.fullPath;
+					error = t(lang, 'info.error_502').replace('{mirror}', mirrorUrl);
+					setTimeout(() => { window.location.href = mirrorUrl; }, 1000);
+				} else {
+					error = `${t(lang, 'info.generic_error')}: ${msg}`;
+				}
 			}
 		} finally {
 			loading = false;

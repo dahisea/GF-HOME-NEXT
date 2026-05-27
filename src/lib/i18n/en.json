@@ -155,6 +155,7 @@
 	"info.unnamed": "Unnamed",
 	"info.unknown_author": "Unknown author",
 	"info.generic_error": "Load failed",
+	"info.error_502": "Backend server unavailable, redirecting to mirror in 1s: {mirror}",
 	"info.no_feedback": "No feedback available",
 	"help.title": "Help",
 	"help.usage_title": "Usage",

@@ -155,6 +155,7 @@
 	"info.unnamed": "無名",
 	"info.unknown_author": "不明な作者",
 	"info.generic_error": "読み込み失敗",
+	"info.error_502": "バックエンドサーバーが利用できません。1秒後にミラーにリダイレクトします：{mirror}",
 	"info.no_feedback": "フィードバックはありません",
 	"help.title": "ヘルプ",
 	"help.usage_title": "使用方法",
