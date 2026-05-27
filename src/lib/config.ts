@@ -65,11 +65,14 @@ interface AdSenseConfig {
   /** 显示广告的语言（空 = 全部）。默认：全部。 */
   allowedLangs: Lang[];
   slots: {
-    generic: string;          inFeedFluid: string;
-    autoRelaxed: string;      homepageAuto: string;
-    homepageFluid: string;    redirectAuto: string;
-    redirectAutoRelaxed: string;
-    sidebarVert: string;
+    /** 小型 1394739154 — fluid in-feed */
+    fluid: string;
+    /** 中型 4095096984 — auto responsive */
+    auto: string;
+    /** 超长 4497590737 — vertical sidebar 190x570 */
+    sidebar: string;
+    /** 大型 3934604756 — autorelaxed */
+    autorelaxed: string;
   };
   fluidLayoutKey: string;
   dnsPrefetch: string[];
@@ -165,9 +168,7 @@ export const siteConfig = {
     'https://static-sg-apse1-primary-mirror-aws-s3-cloudfront-public-cdn.dahi.edu.eu.org',
     'https://static-sg-apse1-primary-mirror-aws-s3-cloudfront-public-cdn.dahi.edu.eu.org.cdn.cloudflare.net',
     'https://tencent.api-data-abtest-config.dahi.edu.eu.org',
-    'https://api-data-aws-abtest-config.dahi.edu.eu.org',
-    'https://abtest-ch-snssdk-os.netlify.app',
-  ],
+    'https://api-data-aws-abtest-config.dahi.edu.eu.org'],
 
   /** 下载页可调参数。 */
   download: {
@@ -221,25 +222,21 @@ export const siteConfig = {
     enabled: true,
     allowedLangs: [] as Lang[], // 空 = 所有语言
     slots: {
-      generic:            '4095096984',
-      inFeedFluid:        '1394739154',
-      autoRelaxed:        '3934604756',
-      homepageAuto:       '4095096984',
-      homepageFluid:      '1394739154',
-      redirectAuto:       '4095096984',
-      redirectAutoRelaxed:'3934604756',
-      sidebarVert:        '4497590737',
+      /** 小型 1394739154 — fluid in-feed */
+      fluid:       '1394739154',
+      /** 中型 4095096984 — auto responsive */
+      auto:        '4095096984',
+      /** 超长 4497590737 — vertical sidebar 190x570 */
+      sidebar:     '4497590737',
+      /** 大型 3934604756 — autorelaxed */
+      autorelaxed: '3934604756',
     },
     fluidLayoutKey: '-gy+2i+5x-ek+82',
     dnsPrefetch: [
       'https://ep1.adtrafficquality.google',
       'https://ep2.adtrafficquality.google',
       'https://googleads.g.doubleclick.net',
-      'https://www.googleadservices.com',
-      'https://www.clarity.ms',
-      'https://s.clarity.ms',
-      'https://hm.baidu.com',
-    ],
+      'https://www.googleadservices.com',    ],
   } satisfies AdSenseConfig,
 
   // ─── 赞助商 ────────────────────────────────────────────────────────

@@ -1,27 +1,20 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
 
 	interface Props {
-		/** AdSense publisher client ID. */
 		client?: string;
-		/** Ad unit slot ID. */
 		slot?: string;
-		/** Ad format: 'auto', 'fluid', 'autorelaxed', 'link', etc. */
 		format?: string;
-		/** data-ad-layout-key for fluid in-feed ads. */
 		layoutKey?: string;
-		/** data-full-width-responsive (only for auto format). */
 		responsive?: boolean;
-		/** Additional CSS class. */
 		className?: string;
-		/** Override inline style on the ins element. */
 		insStyle?: string;
 	}
 
 	let {
 		client = siteConfig.adsense.publisherId,
-		slot = siteConfig.adsense.slots.generic,
+		slot = siteConfig.adsense.slots.auto,
 		format = 'auto',
 		layoutKey = '',
 		responsive = true,
@@ -30,11 +23,11 @@
 	}: Props = $props();
 
 	let adRef: HTMLDivElement;
-	let mounted = $state(false);
 	let adStatus = $state<'pending' | 'filled' | 'empty'>('pending');
 
+	let pushed = false;
+
 	onMount(() => {
-		mounted = true;
 		if (typeof window === 'undefined') return;
 		if (!client || !slot) return;
 		if (adRef.closest('[data-no-ads]')) return;
@@ -54,22 +47,32 @@
 	});
 
 	function pushAd() {
+		if (pushed) return;
+		pushed = true;
+
 		const win = window as unknown as Record<string, unknown>;
-		const q = win.adsbygoogle as Array<Record<string, unknown>> | undefined;
-		if (q) {
-			try {
-				q.push({});
-				setTimeout(() => {
-					const ins = adRef.querySelector<HTMLElement>('.adsbygoogle');
-					if (ins) {
-						const s = ins.getAttribute('data-ad-status');
-						adStatus = s === 'done' ? 'filled' : 'empty';
-					}
-				}, 2500);
-			} catch {
-				// silent
-			}
+		const q = (win.adsbygoogle as Array<Record<string, unknown>>) || [];
+		if (!win.adsbygoogle) {
+			win.adsbygoogle = q;
 		}
+		q.push({});
+
+		// Poll for ad status
+		let attempts = 0;
+		const check = () => {
+			const ins = adRef.querySelector<HTMLElement>('.adsbygoogle');
+			if (ins) {
+				const s = ins.getAttribute('data-ad-status');
+				if (s === 'done') {
+					adStatus = 'filled';
+					return;
+				}
+			}
+			attempts++;
+			if (attempts < 15) setTimeout(check, 400);
+			else adStatus = 'empty';
+		};
+		setTimeout(check, 800);
 	}
 </script>
 
@@ -83,7 +86,7 @@
 		style={insStyle}
 		data-ad-client={client}
 		data-ad-slot={slot}
-		data-ad-format={format}
+		{...format ? { 'data-ad-format': format } : {}}
 		{...responsive && format === 'auto' ? { 'data-full-width-responsive': 'true' } : {}}
 		{...layoutKey ? { 'data-ad-layout-key': layoutKey } : {}}
 	></ins>

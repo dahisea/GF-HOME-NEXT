@@ -2,7 +2,6 @@
 	import { t } from '$lib/i18n';
 	import { getCurrentYear } from '$lib/utils';
 	import { i18nConfig } from '$lib/i18n';
-	import AdSense from '$lib/components/AdSense.svelte';
 	import type { Lang } from '$lib/i18n';
 	import { siteConfig } from '$lib/config';
 	import { goto } from '$app/navigation';
@@ -46,7 +45,8 @@
 		<!-- AdSense (only on ad-enabled locales) -->
 		{#if showAds}
 			<div class="m3-footer-ad">
-				<AdSense />
+				<ins class="adsbygoogle" style="display:block" data-ad-client={siteConfig.adsense.publisherId} data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
+				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 			</div>
 		{/if}
 

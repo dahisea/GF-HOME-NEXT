@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
@@ -129,7 +129,7 @@
 	<section class="sr-page">
 		<!-- Top Ad -->
 		{#if shouldShowAds(lang)}
-			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+			slot=siteConfig.adsense.slots.auto
 		{/if}
 
 		<!-- ── Basic Search ────────────────────────────────────────── -->
@@ -165,7 +165,8 @@
 		<!-- Mid Ad (fluid in-feed) -->
 		{#if shouldShowAds(lang)}
 			<div style="margin:16px 0">
-				<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 			</div>
 		{/if}
 
@@ -267,7 +268,8 @@
 		<!-- Bottom Ad -->
 		{#if shouldShowAds(lang)}
 			<div style="margin-top:24px">
-				<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 			</div>
 		{/if}
 	</section>

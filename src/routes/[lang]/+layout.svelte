@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { page } from '$app/state';
 	import { i18nConfig, getLangFromPath, t, type Lang } from '$i18n';
 	import { siteConfig, siteProxyUrl } from '$lib/config';
@@ -102,11 +102,7 @@
 		<script async src="{siteConfig.cdn.adsenseScript}?client={adClient}" crossorigin="anonymous"></script>
 	{/if}
 	{#if showAds && gtmId && !hideChrome}
-		{@html `<script>
-			(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});
-			var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';
-			j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-			f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');<\/script>`}
+		{@html '(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({"' + "gtm.start" + '":new Date().getTime(),event:"gtm.js"});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!="dataLayer"?"&l="+l:"";j.async=true;j.src="https://www.googletagmanager.com/gtm.js?id=' + gtmId + '";f.parentNode.insertBefore(j,f);})(window,document,"script","dataLayer","' + gtmId + '");'}
 	{/if}
 </svelte:head>
 
@@ -133,18 +129,18 @@
 				<ins class="adsbygoogle ads-firstscreen"
 					style="display:inline-block;width:190px;height:570px"
 					data-ad-client={adClient}
-					data-ad-slot={siteConfig.adsense.slots.sidebarVert}></ins>
-				<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+					data-ad-slot={siteConfig.adsense.slots.sidebar}></ins>
+				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 
 				<!-- Second auto-responsive ad -->
 				<div style="margin-top:24px">
 					<ins class="adsbygoogle"
 						style="display:block"
 						data-ad-client={adClient}
-						data-ad-slot={siteConfig.adsense.slots.generic}
+						data-ad-slot={siteConfig.adsense.slots.auto}
 						data-ad-format="auto"
 						data-full-width-responsive="true"></ins>
-					<script>(adsbygoogle = window.adsbygoogle || []).push({})</script>
+					{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 				</div>
 			</div>
 		</aside>

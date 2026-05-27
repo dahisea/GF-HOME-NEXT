@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { t, type Lang } from '$i18n';
 	import { siteConfig } from '$lib/config';
 	import AdSense from '$components/AdSense.svelte';
@@ -145,7 +145,8 @@
 
 	{#if showAds}
 		<div style="margin-top:24px">
-			<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 </div>

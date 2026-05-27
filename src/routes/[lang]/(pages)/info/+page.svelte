@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
@@ -577,7 +577,8 @@
 
 					{#if shouldShowAds(lang) && additionalInfoHtml}
 						<div style="margin:0 0 16px;text-align:center">
-							<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}
 
@@ -594,7 +595,7 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+							slot=siteConfig.adsense.slots.auto
 						</div>
 					{/if}
 				{:else}
@@ -622,7 +623,8 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 						</div>
 					{/if}
 				{/if}

@@ -309,6 +309,7 @@ a:hover { color: var(--md-sys-color-secondary); }
   display: flex;
   align-items: center;
   padding: 4px 4px 4px 20px;
+  width: 80%;
   transition: all var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
   box-shadow: var(--md-sys-elevation-1);
 }

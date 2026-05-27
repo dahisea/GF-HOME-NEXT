@@ -1,9 +1,7 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/state';
 	import { t } from '$i18n';
 	import { siteConfig, shouldShowAds, getDownloadDomains } from '$lib/config';
-	import AdSense from '$lib/components/AdSense.svelte';
 
 	let { data } = $props<{ data: { lang: string; showAds: boolean } }>();
 	let lang = data.lang;
@@ -243,10 +241,11 @@
 <section class="download-page">
 	{#if shouldShowAds(lang)}
 		<div class="content-wrapper" style="margin-bottom:16px">
-			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+			slot=siteConfig.adsense.slots.auto
 		</div>
 		<div class="content-wrapper" style="margin-bottom:16px">
-			<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 
@@ -264,7 +263,7 @@
 						: '使用方式: 在URL后加上 #/your-script-path.user.js'}
 				</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:16px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+					<div style="margin-top:16px">slot=siteConfig.adsense.slots.auto</div>
 				{/if}
 			{/if}
 
@@ -275,7 +274,7 @@
 				<p class="dl-desc">{progressText}</p>
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+					<div style="margin-top:20px">slot=siteConfig.adsense.slots.auto</div>
 				{/if}
 			{/if}
 
@@ -296,7 +295,8 @@
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} /></div>
+					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
 				{/if}
 			{/if}
 
@@ -322,7 +322,7 @@
 				</div>
 				<div class="dl-tip">提示: 正在随机测试 {selectedDomains.length} 个节点</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+					<div style="margin-top:20px">slot=siteConfig.adsense.slots.auto</div>
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 			{/if}
@@ -337,7 +337,7 @@
 				{/if}
 				<div class="dl-url">{finalUrl}</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+					<div style="margin:12px 0">slot=siteConfig.adsense.slots.auto</div>
 				{/if}
 				{#if testResults.length > 0}
 					<div class="dl-st">
@@ -362,7 +362,7 @@
 				<p class="dl-desc">{errorMsg || '所有节点检测超时, 已随机选择一个节点'}</p>
 				<div class="dl-url">{finalUrl}</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0"><AdSense slot={siteConfig.adsense.slots.generic} format="auto" /></div>
+					<div style="margin:12px 0">slot=siteConfig.adsense.slots.auto</div>
 				{/if}
 				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
 				<div class="dl-tip">若无法访问, 请重新整理再试</div>
@@ -372,13 +372,15 @@
 
 	{#if shouldShowAds(lang)}
 		<div class="content-wrapper" style="margin-top:16px">
-			<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
-			<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
-			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+			slot=siteConfig.adsense.slots.auto
 		</div>
 	{/if}
 </section>

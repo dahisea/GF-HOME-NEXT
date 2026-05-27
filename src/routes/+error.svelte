@@ -1,6 +1,5 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount } from 'svelte';
-	import { page } from '$app/state';
 	import { siteConfig } from '$lib/config';
 
 	onMount(() => {
@@ -26,7 +25,7 @@
 		<ins class="adsbygoogle"
 			style="display:block"
 			data-ad-client={siteConfig.adsense.publisherId}
-			data-ad-slot={siteConfig.adsense.slots.autoRelaxed}
+			data-ad-slot={siteConfig.adsense.slots.autorelaxed}
 			data-ad-format="autorelaxed">
 		</ins>
 	</div>
@@ -48,7 +47,7 @@
 		<ins class="adsbygoogle"
 			style="display:block"
 			data-ad-client={siteConfig.adsense.publisherId}
-			data-ad-slot={siteConfig.adsense.slots.generic}
+			data-ad-slot={siteConfig.adsense.slots.auto}
 			data-ad-format="auto"
 			data-full-width-responsive="true">
 		</ins>

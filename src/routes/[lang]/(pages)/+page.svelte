@@ -1,9 +1,9 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 	import { t, type Lang } from '$i18n';
 	import AdSense from '$components/AdSense.svelte';
-	import { siteConfig, siteUrl, staticUrl, shouldShowAds } from '$lib/config';
+	import { siteConfig, shouldShowAds } from '$lib/config';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -29,30 +29,6 @@
 		});
 		outputUrl = result;
 	}
-
-	// ─── Page section enter animation (IntersectionObserver) ──────────
-	import { onMount } from 'svelte';
-	let sectionRefs: HTMLElement[] = [];
-
-	function observeSections(node: HTMLElement) {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				entries.forEach((entry) => {
-					if (entry.isIntersecting) {
-						entry.target.classList.add('md3-animate-enter');
-						observer.unobserve(entry.target);
-					}
-				});
-			},
-			{ threshold: 0.1 }
-		);
-		node.querySelectorAll('.page-section--centered, .text-content').forEach((el) => {
-			(el as HTMLElement).style.opacity = '0';
-			(el as HTMLElement).style.transform = 'translateY(24px)';
-			observer.observe(el);
-		});
-		return { destroy: () => observer.disconnect() };
-	}
 </script>
 
 <svelte:head>
@@ -60,12 +36,20 @@
 	<meta name="description" content={t(lang, 'meta.home_desc')} />
 </svelte:head>
 
-<div class="width-constraint" use:observeSections>
-	<!-- Hero Search Section -->
-	<section class="page-section--centered" style="margin-top:48px;margin-bottom:32px">
-		<h2 class="headline-medium" style="text-align:center;margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
+<div class="width-constraint">
+
+	<!-- ═══ AD: Top banner (above everything) ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-top:16px">
+			slot=siteConfig.adsense.slots.auto
+		</div>
+	{/if}
+
+	<!-- ═══ Hero Search Section ═══ -->
+	<section style="margin-top:48px;margin-bottom:24px;text-align:center">
+		<h2 class="headline-medium" style="margin-bottom:24px">{t(lang, 'home.super_title')}</h2>
 		<form class="home-search" action="/{lang}/s" accept-charset="UTF-8" method="get" style="display:flex;justify-content:center" onsubmit={e => { e.preventDefault(); const fd = new FormData(e.currentTarget as HTMLFormElement); const q = fd.get('q') as string || ''; const sort = fd.get('sort') as string || ''; const fl = fd.get('filter_locale') as string || '0'; let url = `/${lang}/s?q=${encodeURIComponent(q)}`; if (sort) url += `&sort=${encodeURIComponent(sort)}`; if (fl) url += `&filter_locale=${encodeURIComponent(fl)}`; goto(url); }}>
-			<div class="md3-search-bar" style="max-width:560px">
+			<div class="md3-search-bar">
 				<input type="search" name="q" placeholder={t(lang, 'search.placeholder')} required />
 				<input type="hidden" name="sort" value="" />
 				<input type="hidden" name="filter_locale" value="0" />
@@ -76,23 +60,33 @@
 				</button>
 			</div>
 		</form>
-
-		{#if shouldShowAds(lang)}
-			<div style="margin-top:24px">
-				<AdSense slot={siteConfig.adsense.slots.homepageAuto} format="autorelaxed" />
-			</div>
-		{/if}
 	</section>
 
-	<!-- Intro Section -->
-	<section class="text-content" style="text-align:center">
+	<!-- ═══ AD: Below search bar ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-bottom:24px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
+	{/if}
+
+	<!-- ═══ Intro Section ═══ -->
+	<section style="text-align:center;margin-bottom:24px">
 		<img src="/img/gforkg.svg" alt="site-logo" loading="lazy" style="height:180px;user-select:none;pointer-events:none" />
 		<p style="margin-top:16px;color:var(--md-sys-color-on-surface-variant)">{t(lang, 'home.intro')}</p>
 	</section>
 
-	<!-- ScriptCat Recommend Section (Chinese only) -->
+	<!-- ═══ AD: After intro ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-bottom:24px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
+	{/if}
+
+	<!-- ═══ ScriptCat Recommend (Chinese only) ═══ -->
 	{#if lang === 'zh-hans' || lang === 'zh-hant'}
-		<section class="text-content" style="text-align:center;font-size:0.8em;color:var(--md-sys-color-on-surface-variant)">
+		<section style="text-align:center;font-size:0.8em;color:var(--md-sys-color-on-surface-variant);margin-bottom:24px">
 			<p>
 				{t(lang, 'home.recommend')}
 				<a href="https://www.coolapk.com/link/?url=https://bbs.tampermonkey.net.cn/forum.php" target="_blank" rel="noopener noreferrer">{t(lang, 'home.recommend.link1')}</a>
@@ -101,15 +95,23 @@
 		</section>
 	{/if}
 
-	<!-- Fluid Ad (en/ja only, below ScriptCat section area) -->
+	<!-- ═══ AD: After ScriptCat ═══ -->
 	{#if shouldShowAds(lang)}
-		<section class="text-content" style="text-align:center">
-			<AdSense slot={siteConfig.adsense.slots.homepageFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
-		</section>
+		<div style="text-align:center;margin-bottom:24px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
 	{/if}
 
-	<!-- URL Tool Section -->
-	<section class="text-content" style="text-align:center">
+	<!-- ═══ AD: Before URL tool ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-bottom:24px">
+			slot=siteConfig.adsense.slots.auto
+		</div>
+	{/if}
+
+	<!-- ═══ URL Tool Section ═══ -->
+	<section style="text-align:center;margin-bottom:24px">
 		<p style="margin-bottom:12px;font-weight:500">{t(lang, 'home.url_tool.title')}</p>
 		<div style="display:flex;flex-direction:column;gap:8px;max-width:560px;margin:0 auto 16px">
 			<input type="search" id="inputUrl" bind:value={inputUrl} placeholder={t(lang, 'home.url_tool.placeholder')}
@@ -125,15 +127,24 @@
 		{/if}
 	</section>
 
-	<!-- Mid Ad (auto-relaxed) -->
+	<!-- ═══ AD: After URL tool ═══ -->
 	{#if shouldShowAds(lang)}
-		<section class="text-content" style="text-align:center">
-			<AdSense slot={siteConfig.adsense.slots.autoRelaxed} format="autorelaxed" />
-		</section>
+		<div style="text-align:center;margin-bottom:24px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
 	{/if}
 
-	<!-- TOS & Installing Links -->
-	<section class="text-content" style="text-align:center">
+	<!-- ═══ AD: auto fluid ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-bottom:24px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
+	{/if}
+
+	<!-- ═══ TOS & Installing Links ═══ -->
+	<section style="text-align:center;margin-bottom:24px">
 		<div style="display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap">
 			<span>{t(lang, 'home.tos_agree')}</span>
 			<a href="/{lang}/tos" class="md3-tonal-button md3-ripple" data-sveltekit-preload-data="hover">{t(lang, 'home.tos_link')}</a>
@@ -142,4 +153,16 @@
 			<a href="/{lang}/installing" class="md3-tonal-button md3-ripple" data-sveltekit-preload-data="hover">{t(lang, 'home.installing_link')}</a>
 		</div>
 	</section>
+
+	<!-- ═══ AD: Bottom ═══ -->
+	{#if shouldShowAds(lang)}
+		<div style="text-align:center;margin-bottom:32px">
+			slot=siteConfig.adsense.slots.auto
+		</div>
+		<div style="text-align:center;margin-bottom:32px">
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.autorelaxed} data-ad-format="autorelaxed"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		</div>
+	{/if}
+
 </div>

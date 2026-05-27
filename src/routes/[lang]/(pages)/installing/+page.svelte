@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { t, type Lang } from '$i18n';
 	import { siteConfig, shouldShowAds } from '$lib/config';
 	import AdSense from '$components/AdSense.svelte';
@@ -16,7 +16,8 @@
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">
 	{#if shouldShowAds(lang)}
 		<div class="text-content" style="margin-bottom:16px">
-			<AdSense slot={siteConfig.adsense.slots.inFeedFluid} format="fluid" layoutKey={siteConfig.adsense.fluidLayoutKey} />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.fluid} data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 
@@ -100,7 +101,8 @@
 
 	{#if shouldShowAds(lang)}
 		<div class="text-content" style="margin-top:24px">
-			<AdSense slot={siteConfig.adsense.slots.generic} format="auto" />
+			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot={siteConfig.adsense.slots.auto} data-ad-format="auto" data-full-width-responsive="true"></ins>
+{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
 		</div>
 	{/if}
 </div>
