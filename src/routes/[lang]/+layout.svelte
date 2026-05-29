@@ -9,7 +9,6 @@
 	import Nav from '$components/Nav.svelte';
 	import Footer from '$components/Footer.svelte';
 	import type { LayoutData } from './$types';
-	import '../../app.css';
 
 	let { data, children } = $props<{ data: LayoutData; children: import('svelte').Snippet }>();
 	let lang: Lang = data.lang;
