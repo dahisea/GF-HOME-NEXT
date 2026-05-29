@@ -1,0 +1,152 @@
+{
+  "site": {
+    "name": "GFork Proxy",
+    "tagline": "Greasy Fork Script Accelerated Access Service",
+    "url": "https://home.greasyfork.org.cn",
+    "description": {
+      "zh-hans": "Greasy Fork 油猴脚本加速访问 — 加速脚本下载，高级搜索",
+      "zh-hant": "Greasy Fork 油猴腳本加速訪問 — 加速腳本下載，高級搜索",
+      "en": "Greasy Fork Script Accelerated Access — Multi-CDN acceleration, advanced search",
+      "ja": "Greasy Fork ユーザースクリプト高速アクセス — 高速化、高度な検索"
+    },
+    "keywords": [
+      "greasyfork", "userscript", "tampermonkey", "violentmonkey",
+      "scriptcat", "油猴", "脚本", "加速", "Via轻脚本", "proxy", "gfork",
+      "user.js", "greasemonkey", "CDN", "download accelerator"
+    ],
+    "contactEmail": "greasyfork.org.cn@proton.me"
+  },
+
+  "favicon": {
+    "icon32": "/favicon-32x32.png",
+    "icon16": "/favicon-16x16.png",
+    "iconIco": "/favicon.ico",
+    "appleTouch": "/apple-touch-icon.png",
+    "android192": "/android-chrome-192x192.png",
+    "android512": "/android-chrome-512x512.png",
+    "manifest": "/site.webmanifest"
+  },
+
+  "adsense": {
+    "publisherId": "ca-pub-3758644447684310",
+    "gtmId": "GTM-KZFGTVN7",
+    "enabled": true,
+    "allowedLangs": [],
+    "slots": {
+      "fluid": "1394739154",
+      "auto": "4095096984",
+      "sidebar": "4497590737",
+      "autorelaxed": "3934604756"
+    },
+    "fluidLayoutKey": "-gy+2i+5x-ek+82",
+    "dnsPrefetch": [
+      "https://ep1.adtrafficquality.google",
+      "https://ep2.adtrafficquality.google",
+      "https://googleads.g.doubleclick.net",
+      "https://www.googleadservices.com"
+    ]
+  },
+
+  "cdn": {
+    "siteProxy": "https://gfork.zh-tw.eu.org",
+    "adsenseScript": "https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js"
+  },
+
+  "downloadNodes": [
+    "https://static-sg-apse1-primary-mirror-aws-s3-cloudfront-public-cdn.dahi.edu.eu.org",
+    "https://static-sg-apse1-primary-mirror-aws-s3-cloudfront-public-cdn.dahi.edu.eu.org.cdn.cloudflare.net",
+    "https://tencent.api-data-abtest-config.dahi.edu.eu.org",
+    "https://api-data-aws-abtest-config.dahi.edu.eu.org"
+  ],
+
+  "download": {
+    "testTimeout": 2000,
+    "testCount": 3,
+    "cacheDays": 3,
+    "cacheKey": "gfork_fastest_domain",
+    "ipTimeout": 3000,
+    "cacheTimeout": 2000,
+    "initTimeout": 1000,
+    "autoFallbackMs": 16100,
+    "showProgressOnly": true,
+    "useQueryString": false,
+    "debugMode": false
+  },
+
+  "lookupNodes": {
+    "primary": [
+      { "id": "TCT", "endpoint": "https://web-static-origin.dahi.edu.cn.dahi.e.yu.ac.cn/gftls", "method": "POST" }
+    ],
+    "backup": [
+      { "id": "ALI", "endpoint": "https://web-static-origin.e.yu.ac.cn/gftls", "method": "POST" },
+      { "id": "AWSP", "endpoint": "https://dev-volcengine-auth.netlify.app/gftls", "method": "POST" },
+      { "id": "CFWK", "endpoint": "https://volcengine-cf-gateway.dahi.edu.eu.org/gftls", "method": "POST" },
+      { "id": "AWSS", "endpoint": "https://api-edge-sakiko-dispatch-network-aws-nf-cdn.dahi.edu.eu.org/gftls", "method": "POST" }
+    ]
+  },
+
+  "lookupSignature": {
+    "mode": "sha256Timestamp",
+    "ssLength": 9
+  },
+
+  "infoApi": {
+    "primary": "https://web-static-origin.dahi.edu.cn.dahi.e.yu.ac.cn/gfinfo"
+  },
+
+  "greasyforkRegion": "cn",
+
+  "redirects": {
+    "searchDelaySec": 3,
+    "downloadDelaySec": 3
+  },
+
+  "seo": {
+    "twitterHandle": "",
+    "defaultOgImage": "/android-chrome-512x512.png",
+    "googleVerification": "",
+    "baiduVerification": "",
+    "bingVerification": ""
+  },
+
+  "sponsor": {
+    "name": "Secbit.ai",
+    "url": "https://secbit.ai/",
+    "image": "/img/scai.gif"
+  },
+
+  "footer": {
+    "icpNumber": "萌 20213149 号",
+    "icpLink": "https://icp.gov.moe/?keyword=20213149",
+    "ratingImage": "/img/15p.svg",
+    "copyrightYears": "2020–2026"
+  },
+
+  "github": {
+    "org": "https://github.com/greasyfork-proxy",
+    "repo": "https://github.com/greasyfork-proxy/greasyfork-mirror",
+    "gfHomeNext": "https://github.com/greasyfork-proxy",
+    "gfHomeSvelteKit": "https://github.com/greasyfork-proxy"
+  },
+
+  "links": {
+    "tampermonkey": "https://www.tampermonkey.net/",
+    "violentmonkey": "https://violentmonkey.github.io/",
+    "greasemonkey": "https://www.greasesmonkey.org/",
+    "scriptcat": "https://docs.scriptcat.org/",
+    "greasyfork": "https://greasyfork.org/",
+    "sleazyfork": "https://sleazyfork.org/",
+    "bbsTampermonkey": "https://bbs.tampermonkey.net.cn/forum.php"
+  },
+
+  "audit": {
+    "enabled": false,
+    "endpoint": "http://localhost:3001",
+    "corsOrigin": "https://home.greasyfork.org.cn"
+  },
+
+  "urlRewriteRules": [
+    { "from": "https?://(www\\.)?greasyfork\\.org", "to": "https://gfork.zh-tw.eu.org" },
+    { "from": "https?://(www\\.)?sleazyfork\\.org", "to": "https://gfork.zh-tw.eu.org" }
+  ]
+}

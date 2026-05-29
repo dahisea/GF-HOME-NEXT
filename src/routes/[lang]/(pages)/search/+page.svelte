@@ -118,8 +118,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'meta.search_title')}</title>
+<title>{t(lang, 'meta.search_title')}</title>
 	<meta name="description" content={t(lang, 'meta.search_desc')} />
+	<meta name="keywords" content="userscript search, greasyfork search, script search, browser scripts, user scripts advanced search" />
 </svelte:head>
 
 <div class="width-constraint">

@@ -10,8 +10,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'meta.applist_title')}</title>
+<title>{t(lang, 'meta.applist_title')}</title>
 	<meta name="description" content={t(lang, 'meta.applist_desc')} />
+	<meta name="keywords" content="userscript managers, tampermonkey, greasemonkey, scriptcat, violentmonkey, browser extensions, user script managers" />
 </svelte:head>
 
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">

@@ -9,8 +9,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'meta.installing_title')}</title>
+<title>{t(lang, 'meta.installing_title')}</title>
 	<meta name="description" content={t(lang, 'meta.installing_desc')} />
+	<meta name="keywords" content="userscript installation guide, script manager install, tampermonkey installation, greasemonkey installation, user script setup" />
 </svelte:head>
 
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">

@@ -263,7 +263,7 @@
 				const msg = (e as Error).message || '';
 				if (msg.includes('502') && route) {
 					errorKey = 'info.generic_error';
-					const mirrorUrl = siteProxyUrl() + route.fullPath;
+						const mirrorUrl = siteProxyUrl() + route.fullPath.replace(/\/detail$/, '');
 					error = t(lang, 'info.error_502').replace('{mirror}', mirrorUrl);
 					setTimeout(() => { window.location.href = mirrorUrl; }, 1000);
 				} else {
@@ -286,7 +286,7 @@
 		scriptMetaHtml = decodeBase64(json.c2);
 		additionalInfoHtml = decodeBase64(json.c3);
 		installLink = json.install || '';
-		document.title = scriptTitle ? `${scriptTitle} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
+		document.title = scriptTitle ? `${scriptTitle} - ZGF` : `Script Info - ZGF`;
 	}
 
 		async function loadFeedbackPage(r: RouteInfo, signal: AbortSignal, page = 1): Promise<void> {
@@ -299,7 +299,7 @@
 			feedbackPage = json.page || 1;
 			feedbackTotalPages = json.totalPages || 1;
 			feedbackListHtml = decodeBase64(json.c1) || `<p style="text-align:center;color:var(--md-sys-color-on-surface-variant);padding:40px">${t(lang, 'info.no_feedback')}</p>`;
-		document.title = feedbackTitle ? `${feedbackTitle} - ${t(lang, 'info.feedback_tab')}` : t(lang, 'info.feedback_tab');
+		document.title = feedbackTitle ? `${feedbackTitle} - ZGF` : `Feedback - ZGF`;
 	}
 
 		async function goToFeedbackPage(page: number): Promise<void> {
@@ -325,7 +325,7 @@
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		const json = await res.json();
 		userData = json.user && typeof json.user === 'object' && json.user.name ? json.user : json;
-		document.title = userData.name ? `${userData.name} - ${t(lang, 'nav.info')}` : t(lang, 'nav.info');
+		document.title = userData.name ? `${userData.name} - ZGF` : `Script Info - ZGF`;
 	}
 
 	// ─── Lifecycle ──────────────────────────────────────────────────────
@@ -418,6 +418,9 @@
 </script>
 
 <svelte:head>
+	<title>Script Info - ZGF</title>
+	<meta name="description" content="Detailed information about user scripts on Greasy Fork, including descriptions, ratings, install links and user feedback." />
+	<meta name="keywords" content="script info, userscript details, greasyfork script, script page, user script, script feedback" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </svelte:head>
 
@@ -484,7 +487,7 @@
 					{#if userData.scripts && userData.scripts.filter(s => !s.deleted).length > 0}
 						<ol class="if-script-list">
 							{#each userData.scripts.filter(s => !s.deleted) as script, i (script.id)}
-								<li class="if-result-item" style="animation: if-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
+								<li class="if-result-item" style="animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 									<article>
 										<h2>
 											<a class="if-script-link" href={`#/${route?.locale || i18nConfig.langNames[lang]}/scripts/${script.id}/detail`}>
@@ -699,6 +702,7 @@
 		padding: 16px;
 		margin-bottom: 12px;
 		opacity: 0;
+		animation: if-fadeIn 0.3s ease-out forwards;
 		background: var(--md-sys-color-surface);
 		transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 	}
@@ -764,12 +768,14 @@
 
 	/* ─── GF content containers ───────────────────────── */
 	.if-content-area {
-		background: var(--md-sys-color-surface-container-low);
-		border: 1px solid var(--md-sys-color-outline-variant);
+		background: var(--glass-bg);
+		backdrop-filter: blur(var(--glass-blur));
+		-webkit-backdrop-filter: blur(var(--glass-blur));
+		border: 1px solid var(--glass-border);
 		border-radius: var(--md-sys-shape-corner-medium);
 		padding: 24px;
 		margin-bottom: 16px;
-		box-shadow: var(--md-sys-elevation-1);
+		box-shadow: var(--glass-shadow);
 		overflow-x: auto;
 	}
 

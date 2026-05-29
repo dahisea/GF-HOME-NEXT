@@ -53,9 +53,9 @@
 	const isActive = (href: string) => page.url.pathname === href;
 </script>
 
-<header class="m3-nav-header">
+<header class="m3-nav-header glass-nav">
 	<nav class="m3-nav-inner">
-		<a href="/{lang}" class="m3-nav-brand" data-sveltekit-preload-data="hover">{t(lang, 'site.name')}</a>
+		<a href="/{lang}" class="m3-nav-brand" data-sveltekit-preload-data="hover">GreasyFork镜像 Proxy</a>
 
 		<!-- Desktop links -->
 		<div class="m3-nav-links">
@@ -151,7 +151,7 @@
 		<button class="m3-drawer-overlay" onclick={() => mobileOpen = false} aria-label="Close menu"></button>
 		<nav class="m3-drawer" class:open={mobileOpen} bind:this={drawerRef}>
 			<div class="m3-drawer-header">
-				<span class="m3-drawer-title">{t(lang, 'site.name')}</span>
+				<span class="m3-drawer-title">GreasyFork镜像 Proxy</span>
 				<button class="m3-drawer-close" onclick={() => mobileOpen = false} aria-label="Close menu">
 					<svg class="m3-drawer-close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

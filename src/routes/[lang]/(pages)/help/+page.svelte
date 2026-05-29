@@ -35,8 +35,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'meta.help_title')}</title>
+<title>{t(lang, 'meta.help_title')}</title>
 	<meta name="description" content={t(lang, 'meta.help_desc')} />
+	<meta name="keywords" content="greasyfork help, userscript help, script installation help, tampermonkey help, greasemonkey help, user script support" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </svelte:head>
 

@@ -227,21 +227,30 @@
 		error = '';
 		responseNode = '';
 
-		const primaryResult = await raceNodes(PRIMARY_NODES, signal);
-		if (primaryResult.success && primaryResult.data) {
-			responseNode = primaryResult.node ? nodeName(primaryResult.node) : '';
-			handleResults(primaryResult.data);
+		const allNodes = [...PRIMARY_NODES, ...BACKUP_NODES];
+
+		const result = await raceNodes(allNodes, signal);
+		if (result.success && result.data) {
+			responseNode = result.node ? nodeName(result.node) : '';
+			handleResults(result.data);
 			return;
 		}
 
-		const backupResult = await raceNodes(BACKUP_NODES, signal);
-		if (backupResult.success && backupResult.data) {
-			responseNode = backupResult.node ? nodeName(backupResult.node) : '';
-			handleResults(backupResult.data);
-		} else {
-			error = backupResult.message || 'All API requests failed';
-			loading = false;
+		const maxRetries = 6;
+		for (let attempt = 0; attempt < maxRetries; attempt++) {
+			await new Promise(r => setTimeout(r, 500));
+			if (signal.aborted) return;
+			const randomNode = allNodes[Math.floor(Math.random() * allNodes.length)];
+			const retryResult = await fetchFromNode(randomNode, signal);
+			if (retryResult.success && retryResult.data) {
+				responseNode = nodeName(retryResult.node!);
+				handleResults(retryResult.data);
+				return;
+			}
 		}
+
+		error = result.message || 'All API requests failed';
+		loading = false;
 	}
 
 	function handleResults(data: ScriptResult[]): void {
@@ -463,8 +472,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'lookup.title')} - {t(lang, 'site.name')}</title>
+<title>{t(lang, 'lookup.title')} - ZGF</title>
 	<meta name="description" content={t(lang, 'lookup.description')} />
+	<meta name="keywords" content="userscript search, greasyfork lookup, script search, browser scripts, greasyfork scripts, user scripts" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </svelte:head>
 
@@ -722,11 +732,13 @@
 	/* ─── Sidebar ──────────────────────────────────────── */
 	.lk-sidebar {
 		width: 280px; flex-shrink: 0;
-		background: var(--md-sys-color-surface-container-low);
-		border: 1px solid var(--md-sys-color-outline-variant);
+		background: var(--glass-bg);
+		backdrop-filter: blur(var(--glass-blur));
+		-webkit-backdrop-filter: blur(var(--glass-blur));
+		border: 1px solid var(--glass-border);
 		border-radius: var(--md-sys-shape-corner-medium);
 		padding: 20px;
-		box-shadow: var(--md-sys-elevation-1);
+		box-shadow: var(--glass-shadow);
 		position: sticky; top: 16px;
 		max-height: calc(100vh - 32px);
 		overflow-y: auto;
@@ -845,17 +857,23 @@
 	.lk-script-list { list-style: none; padding: 0; margin: 0; }
 
 	.lk-result-item {
-		background: var(--md-sys-color-surface-container-low);
-		border: 1px solid var(--md-sys-color-outline-variant);
+		background: var(--glass-bg);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border: 1px solid var(--glass-border);
 		border-radius: var(--md-sys-shape-corner-medium);
 		padding: 20px;
 		margin-bottom: 12px;
-		box-shadow: var(--md-sys-elevation-1);
+		box-shadow: var(--glass-shadow);
 		opacity: 0;
 		contain: layout style;
 		transition: box-shadow var(--md-sys-motion-duration-short) var(--md-sys-motion-easing-standard);
 	}
-	.lk-result-item:hover { box-shadow: var(--md-sys-elevation-2); }
+	.lk-result-item:hover {
+		background: var(--glass-bg-hover);
+		box-shadow: 0 12px 40px rgba(0,0,0,0.09);
+		transform: translateY(-2px);
+	}
 
 	.lk-result-item h2 {
 		margin: 0 0 10px; font-size: 16px;

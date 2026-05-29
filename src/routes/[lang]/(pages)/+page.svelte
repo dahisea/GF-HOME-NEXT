@@ -30,8 +30,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'meta.home_title')}</title>
+<title>{t(lang, 'meta.home_title')}</title>
 	<meta name="description" content={t(lang, 'meta.home_desc')} />
+	<meta name="keywords" content="greasyfork, mirror, proxy, userscript, userscripts, greasyfork mirror, script acceleration, user scripts" />
 </svelte:head>
 
 <div class="width-constraint">

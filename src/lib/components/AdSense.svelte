@@ -95,23 +95,7 @@
 <style>
 	.ad-unit {
 		width: 100%;
-		min-height: 90px;
 		margin: 1rem 0;
 		text-align: center;
-	}
-	.ad-unit:not([data-ad-status="filled"]) {
-		background: linear-gradient(
-			90deg,
-			var(--md-sys-color-surface-variant, #e0e0e0) 25%,
-			var(--md-sys-color-surface-container-high, #f5f5f5) 50%,
-			var(--md-sys-color-surface-variant, #e0e0e0) 75%
-		);
-		background-size: 200% 100%;
-		animation: ad-shimmer 1.5s infinite;
-		border-radius: var(--md-sys-shape-corner-extra-small, 4px);
-	}
-	@keyframes ad-shimmer {
-		0% { background-position: 200% 0; }
-		100% { background-position: -200% 0; }
 	}
 </style>

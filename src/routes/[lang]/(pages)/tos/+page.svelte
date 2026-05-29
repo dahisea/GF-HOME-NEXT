@@ -10,6 +10,7 @@
 <svelte:head>
 	<title>{t(lang, 'meta.tos_title')}</title>
 	<meta name="description" content={t(lang, 'meta.tos_desc')} />
+	<meta name="keywords" content="terms of service, greasyfork proxy terms, user agreement, tos" />
 </svelte:head>
 
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">

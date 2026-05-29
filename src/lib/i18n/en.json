@@ -15,7 +15,7 @@
 	"lang.en": "English",
 	"lang.ja": "日本語",
 	"language.select": "Select Language",
-	"home.super_title": "Greasy Fork Proxy Tool",
+	"home.super_title": "Greasy Fork User Scripts CDN Accelerated Access - Global Multi-Node Deployment",
 	"home.intro": "Welcome to the world of 'browser user scripts'. GFork is dedicated to providing reliable mirror acceleration for Greasy Fork users, speeding up access through Asia-Pacific servers and solving loading errors for a smoother script installation experience. GFork only provides web pages and accelerated downloads — it does not create or store any scripts or data content. All content is synchronized with the official site in real time. GFork is not directly affiliated with Greasy Fork, and users bear their own responsibility for the legality and risks of script content. All content displayed on this site has undergone automatic compliance review through a filtering system, ensuring data consistency with the official site except for update links. GFork is not responsible for any copyright issues or disputes arising from third-party scripts.",
 	"home.recommend": "If you are a user in mainland China with automation needs for educational platforms or video platforms, we strongly recommend using the user script store ScriptCat, operated by 油猴中文网 (bbs.tampermonkey.net.cn), to download user scripts (Note: 油猴中文网 and ScriptCat servers are located in Japan) for better community support.",
 	"home.recommend.link1": "Tampermonkey Chinese Forum",

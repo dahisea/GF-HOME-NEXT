@@ -215,8 +215,9 @@
 </script>
 
 <svelte:head>
-	<title>{t(lang, 'download.title')} - {t(lang, 'site.name')}</title>
+<title>{t(lang, 'download.title')} - ZGF</title>
 	<meta name="description" content={t(lang, 'download.description')} />
+	<meta name="keywords" content="script download, userscript install, script acceleration download, greasyfork download, user script download" />
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 </svelte:head>
 

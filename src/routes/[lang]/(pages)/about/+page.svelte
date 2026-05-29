@@ -27,6 +27,7 @@
 <svelte:head>
 	<title>{t(lang, 'meta.about_title')}</title>
 	<meta name="description" content={t(lang, 'meta.about_desc')} />
+	<meta name="keywords" content="about greasyfork, mirror service, greasyfork mirror, userscripts, greasy fork proxy, script acceleration" />
 </svelte:head>
 
 <div class="container-main" style="padding-top:32px;padding-bottom:32px">

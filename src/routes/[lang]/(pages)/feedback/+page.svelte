@@ -10,6 +10,7 @@
 <svelte:head>
 	<title>{t(lang, 'meta.feedback_title')}</title>
 	<meta name="description" content={t(lang, 'meta.feedback_desc')} />
+	<meta name="keywords" content="greasyfork feedback, contact, userscript feedback, user script support" />
 </svelte:head>
 
 <div class="width-constraint" style="padding-top:32px;padding-bottom:32px">

@@ -1,5 +1,5 @@
 import { i18nConfig, isValidLang } from '$i18n';
-import { siteConfig } from '$lib/config';
+import { siteConfig } from '$config';
 import type { Handle } from '@sveltejs/kit';
 
 const SPECIAL_ROUTES = ['/s', '/l', '/sitemap.xml', '/robots.txt'];
