@@ -4,7 +4,7 @@
 	import { i18nConfig } from '$lib/i18n';
 	import type { Lang } from '$lib/i18n';
 	import { siteConfig } from '$lib/config';
-	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
+	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
 	import { goto } from '$app/navigation';
 
 	let { lang, showAds = false }: { lang: Lang; showAds?: boolean } = $props();

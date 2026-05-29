@@ -1,7 +1,7 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
-	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
+	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
 
 	onMount(() => {
 		const w = window as unknown as Record<string, unknown>;

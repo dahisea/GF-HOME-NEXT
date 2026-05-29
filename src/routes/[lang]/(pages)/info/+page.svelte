@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
 	import { siteConfig, siteProxyUrl, shouldShowAds } from '$lib/config';
-	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
+	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

@@ -2,7 +2,7 @@
 	import { page } from '$app/state';
 	import { i18nConfig, getLangFromPath, t, type Lang } from '$i18n';
 	import { siteConfig, siteProxyUrl } from '$lib/config';
-	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
+	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
 	import { sendAudit } from '$lib/audit';
 	import { onMount } from 'svelte';
 	import { initTheme, handleSystemChange } from '$lib/theme.svelte';
@@ -49,7 +49,6 @@
 
 	let cleanPath: string = $derived(page.url.pathname.replace(/^\/[^/]+/, '') || '/');
 	let hideChrome: boolean = $derived(/^\/(s|l)(\/|$)/.test(cleanPath));
-	let hideSidebar: boolean = $derived(/^\/(lookup|info)\b/.test(cleanPath));
 	let gtmId = siteConfig.adsense.gtmId;
 	let adPrefetchDomains = siteConfig.adsense.dnsPrefetch;
 	let cdnStatic = $derived(siteConfig.cdn.enabled ? siteConfig.cdn.static : '');
@@ -126,19 +125,7 @@
 		{@render children()}
 	</main>
 
-	{#if showAds && !hideChrome && !hideSidebar}
-		<aside class="m3-sidebar-ad">
-			<div class="m3-sidebar-ad-inner">
-				<!-- Vertical sidebar ad (first-screen, instant load) -->
-				{@html adSidebar()}
 
-				<!-- Second auto-responsive ad -->
-				<div style="margin-top:24px">
-					{@html adAuto()}
-				</div>
-			</div>
-		</aside>
-	{/if}
 </div>
 
 {#if !hideChrome}
@@ -160,22 +147,7 @@
 		min-height: var(--md-sys-layout-min-height, calc(100vh - 3.5rem - 8rem));
 	}
 
-	.m3-sidebar-ad {
-		flex-shrink: 0;
-		width: 190px;
-	}
-
-	.m3-sidebar-ad-inner {
-		position: sticky;
-		top: 88px;
-		padding-top: 24px;
-		display: flex;
-		flex-direction: column;
-		gap: 0;
-	}
-
 	@media (max-width: 899px) {
-		.m3-sidebar-ad { display: none; }
 		.m3-layout-body { padding: 0; }
 	}
 </style>

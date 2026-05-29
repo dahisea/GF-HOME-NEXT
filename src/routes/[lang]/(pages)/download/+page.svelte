@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$i18n';
 	import { siteConfig, shouldShowAds, getDownloadDomains } from '$lib/config';
-	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
+	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
 
 	let { data } = $props<{ data: { lang: string; showAds: boolean } }>();
 	let lang = data.lang;
