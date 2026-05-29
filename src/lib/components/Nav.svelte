@@ -145,11 +145,12 @@
 			</svg>
 		</button>
 	</nav>
+</header>
 
-	<!-- Mobile drawer -->
-	{#if mobileOpen}
-		<button class="m3-drawer-overlay" onclick={() => mobileOpen = false} aria-label="Close menu"></button>
-		<nav class="m3-drawer" class:open={mobileOpen} bind:this={drawerRef}>
+<!-- Mobile drawer -->
+{#if mobileOpen}
+	<button class="m3-drawer-overlay" onclick={() => mobileOpen = false} aria-label="Close menu"></button>
+	<nav class="m3-drawer" class:open={mobileOpen} bind:this={drawerRef}>
 			<div class="m3-drawer-header">
 				<span class="m3-drawer-title">GreasyFork镜像 Proxy</span>
 				<button class="m3-drawer-close" onclick={() => mobileOpen = false} aria-label="Close menu">
@@ -215,7 +216,6 @@
 			</div>
 		</nav>
 	{/if}
-</header>
 
 <style>
 	/* ─── Top bar ─────────────────────── */

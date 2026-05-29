@@ -616,14 +616,14 @@
 						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={gfLocale}>{@html feedbackListHtml}</div>
 					{#if feedbackTotalPages > 1}
 						<nav class="if-pagination">
-							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} onclick={() => goToFeedbackPage(1)}>
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} style="opacity:{feedbackPage === 1 ? '0.4' : '1'}" onclick={() => goToFeedbackPage(1)}>
 								{t(lang, 'lookup.pagination.first')}
 							</button>
-							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} onclick={() => goToFeedbackPage(feedbackPage - 1)}>
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === 1} style="opacity:{feedbackPage === 1 ? '0.4' : '1'}" onclick={() => goToFeedbackPage(feedbackPage - 1)}>
 								{t(lang, 'lookup.pagination.prev')}
 							</button>
 							<span class="if-page-indicator">{feedbackPage} / {feedbackTotalPages}</span>
-							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === feedbackTotalPages} onclick={() => goToFeedbackPage(feedbackPage + 1)}>
+							<button class="md3-outlined-button if-page-btn" disabled={feedbackPage === feedbackTotalPages} style="opacity:{feedbackPage === feedbackTotalPages ? '0.4' : '1'}" onclick={() => goToFeedbackPage(feedbackPage + 1)}>
 								{t(lang, 'lookup.pagination.next')}
 							</button>
 							{#if feedbackLoading}

@@ -92,9 +92,7 @@
 	<div class="card">
 		<div class="card-glow"></div>
 		<div class="card-content">
-			<div class="logo-row">
-				<span class="logo-text">ZGF</span>
-			</div>
+			<span class="spin-icon material-icons">refresh</span>
 			<p id="redirect-countdown-text" class="countdown">{waitTemplate.replace('{countdown}', String(delaySec))}</p>
 			<div class="ads-container">
 				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -120,9 +118,8 @@
 		justify-content: center;
 		min-height: 100vh;
 		padding: 20px;
-		background: linear-gradient(135deg, #1a0a00 0%, #2d1200 25%, #4a1e00 50%, #3a1600 75%, #1a0a00 100%);
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-		overflow: hidden;
+		background: var(--md-sys-color-surface);
+		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 	}
 	.keywords-bg {
 		position: fixed;
@@ -137,96 +134,40 @@
 		align-content: center;
 		justify-content: center;
 	}
-	.kw-col {
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-		min-width: 140px;
-		flex: 1;
-		max-width: 220px;
-	}
-	.kw-col span {
-		color: #ff9466;
-		font-size: 13px;
-		font-weight: 500;
-		opacity: 0.04;
-		letter-spacing: 0.5px;
-		white-space: nowrap;
-		text-align: center;
-	}
+	.kw-col { display: flex; flex-direction: column; gap: 14px; min-width: 140px; flex: 1; max-width: 220px; }
+	.kw-col span { color: var(--md-sys-color-primary); font-size: 13px; font-weight: 500; opacity: 0.04; letter-spacing: 0.5px; white-space: nowrap; text-align: center; }
 	.card {
-		position: relative;
-		z-index: 1;
-		width: 100%;
-		max-width: 460px;
-		background: rgba(255, 255, 255, 0.03);
+		position: relative; z-index: 1; width: 100%; max-width: 460px;
+		background: var(--glass-bg);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 20px;
-		overflow: hidden;
+		border: 1px solid var(--glass-border);
+		border-radius: 20px; overflow: hidden;
 	}
 	.card-glow {
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(ellipse at 50% 0%, rgba(127, 51, 0, 0.15) 0%, transparent 70%);
-		pointer-events: none;
+		position: absolute; inset: 0;
+		background: radial-gradient(ellipse at 50% 0%, var(--md-sys-color-primary-container) 0%, transparent 70%);
+		pointer-events: none; opacity: 0.15;
 	}
-	.card-content {
-		position: relative;
-		padding: 32px 28px 24px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-	.logo-row {
+	.card-content { position: relative; padding: 40px 28px 24px; display: flex; flex-direction: column; align-items: center; }
+	.spin-icon {
+		font-size: 48px; color: var(--md-sys-color-primary);
+		animation: spin 1s linear infinite;
 		margin-bottom: 20px;
 	}
-	.logo-text {
-		font-size: 32px;
-		font-weight: 700;
-		letter-spacing: 4px;
-		background: linear-gradient(135deg, #ff8a50 0%, #ff6b2b 50%, #e85d1a 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
+	@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
 	.countdown {
-		font-size: 15px;
-		color: rgba(255, 255, 255, 0.6);
-		margin: 0 0 20px;
-		text-align: center;
-		font-weight: 400;
-		letter-spacing: 0.3px;
+		font-size: 16px; color: var(--md-sys-color-on-surface-variant); margin: 0 0 20px;
+		text-align: center; font-weight: 400; letter-spacing: 0.3px;
 	}
-	.ads-container {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		margin-bottom: 8px;
-	}
-	.skip {
-		margin: 20px 0 8px;
-		text-align: center;
-	}
+	.ads-container { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+	.skip { margin: 20px 0 8px; text-align: center; }
 	.skip :global(button) {
-		display: inline-block;
-		padding: 12px 36px;
-		background: linear-gradient(135deg, #8a3700 0%, #7f3300 100%);
-		color: #fff;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 999px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		letter-spacing: 0.3px;
-		transition: all 0.2s ease;
-		box-shadow: 0 4px 20px rgba(127, 51, 0, 0.3);
+		display: inline-block; padding: 12px 36px;
+		background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+		border: none; border-radius: 999px; font-size: 14px; font-weight: 500;
+		cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s ease;
+		box-shadow: 0 4px 20px rgba(127,51,0,0.25);
 	}
-	.skip :global(button:hover) {
-		background: linear-gradient(135deg, #a34400 0%, #943c00 100%);
-		box-shadow: 0 6px 28px rgba(127, 51, 0, 0.45);
-		transform: translateY(-1px);
-	}
+	.skip :global(button:hover) { filter: brightness(1.15); box-shadow: 0 6px 28px rgba(127,51,0,0.35); transform: translateY(-1px); }
 </style>

@@ -634,7 +634,7 @@
 							<li class="lk-result-item" style="animation: lk-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
 								<article>
 									<h2>
-										<a class="lk-script-link" href={getScriptInfoUrl(script)}>
+										<a class="lk-script-link" href={getScriptInfoUrl(script)} target="_blank" rel="noopener noreferrer">
 											{script.name || t(lang, 'lookup.unnamed')}
 										</a>
 										<span class="lk-badge-js" title="User Script">JS</span>
@@ -644,7 +644,7 @@
 									<div class="lk-script-meta">
 										<dl class="lk-stats">
 											<dt>{t(lang, 'lookup.author')}</dt>
-											<dd><a href={getAuthorUrl(script)}>{escapeHtml(script.users?.[0]?.name || t(lang, 'lookup.unknown_author'))}</a></dd>
+											<dd><a href={getAuthorUrl(script)} target="_blank" rel="noopener noreferrer">{escapeHtml(script.users?.[0]?.name || t(lang, 'lookup.unknown_author'))}</a></dd>
 											<dt>{t(lang, 'lookup.daily_installs')}</dt>
 											<dd>{script.daily_installs || 0}</dd>
 											<dt>{t(lang, 'lookup.total_installs')}</dt>
