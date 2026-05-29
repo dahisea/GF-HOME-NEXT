@@ -4,6 +4,7 @@
 	import { i18nConfig } from '$lib/i18n';
 	import type { Lang } from '$lib/i18n';
 	import { siteConfig } from '$lib/config';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 	import { goto } from '$app/navigation';
 
 	let { lang, showAds = false }: { lang: Lang; showAds?: boolean } = $props();
@@ -45,8 +46,7 @@
 		<!-- AdSense (only on ad-enabled locales) -->
 		{#if showAds}
 			<div class="m3-footer-ad">
-				<ins class="adsbygoogle" style="display:block" data-ad-client="3044" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+				{@html adAuto()}
 			</div>
 		{/if}
 

@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
 	import { siteConfig, siteProxyUrl, shouldShowAds } from '$lib/config';
-	import AdSense from '$components/AdSense.svelte';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -588,8 +588,7 @@
 
 					{#if shouldShowAds(lang) && additionalInfoHtml}
 						<div style="margin:0 0 16px;text-align:center">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+							{@html adFluid()}
 						</div>
 					{/if}
 
@@ -606,8 +605,7 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+							{@html adAuto()}
 						</div>
 					{/if}
 				{:else}
@@ -635,8 +633,7 @@
 
 					{#if shouldShowAds(lang)}
 						<div style="margin-top:16px">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+							{@html adAutorelaxed()}
 						</div>
 					{/if}
 				{/if}

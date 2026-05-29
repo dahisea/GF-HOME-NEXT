@@ -1,7 +1,6 @@
 ﻿<script lang="ts">
 	import { t, type Lang } from '$i18n';
 	import { siteConfig } from '$lib/config';
-	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();

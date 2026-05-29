@@ -3,8 +3,8 @@
 	import { page } from '$app/state';
 	import { t, type Lang, i18nConfig } from '$i18n';
 	import { siteConfig, getPrimaryLookupNodes, getBackupLookupNodes, shouldShowAds } from '$lib/config';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 	import { sendAudit } from '$lib/audit';
-	import AdSense from '$components/AdSense.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -591,11 +591,10 @@
 
 				{#if shouldShowAds(lang)}
 					<div style="margin-top:16px;text-align:center">
-						<AdSense slot="4497590737" format="" insStyle="display:inline-block;width:190px;height:570px" />
+						{@html adSidebar()}
 					</div>
 					<div style="margin-top:24px;text-align:center">
-						<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+						{@html adAuto()}
 					</div>
 				{/if}
 			</aside>
@@ -627,8 +626,7 @@
 						{#each results as script, i (script.id)}
 							{#if i > 0 && i % 5 === 0 && shouldShowAds(lang)}
 								<li class="lk-ad-item" style="display:flex;justify-content:center;padding:16px 0">
-									<div style="width:100%;max-width:672px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+									<div style="width:100%;max-width:672px">{@html adFluid()}</div>
 								</li>
 							{/if}
 							<li class="lk-result-item" style="animation: lk-fadeIn 0.3s ease-out forwards; animation-delay: {Math.min(0.05 * i, 0.5)}s;">
@@ -684,8 +682,7 @@
 
 					{#if shouldShowAds(lang) && results.length > 3}
 						<div style="margin:16px 0">
-							<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+							{@html adFluid()}
 						</div>
 					{/if}
 
@@ -705,8 +702,7 @@
 
 				{#if shouldShowAds(lang)}
 					<div style="margin:16px 0">
-						<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+						{@html adAuto()}
 					</div>
 				{/if}
 			</div>

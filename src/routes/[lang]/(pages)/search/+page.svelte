@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig, shouldShowAds } from '$lib/config';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -127,8 +128,7 @@
 	<section class="sr-page">
 		<!-- Top Ad -->
 		{#if shouldShowAds(lang)}
-		<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+		{@html adAuto()}
 		{/if}
 
 		<!-- ── Basic Search ────────────────────────────────────────── -->
@@ -164,8 +164,7 @@
 		<!-- Mid Ad (fluid in-feed) -->
 		{#if shouldShowAds(lang)}
 			<div style="margin:16px 0">
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+				{@html adFluid()}
 			</div>
 		{/if}
 
@@ -267,8 +266,7 @@
 		<!-- Bottom Ad -->
 		{#if shouldShowAds(lang)}
 			<div style="margin-top:24px">
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+				{@html adFluid()}
 			</div>
 		{/if}
 	</section>

@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import { i18nConfig, getLangFromPath, t, type Lang } from '$i18n';
 	import { siteConfig, siteProxyUrl } from '$lib/config';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 	import { sendAudit } from '$lib/audit';
 	import { onMount } from 'svelte';
 	import { initTheme, handleSystemChange } from '$lib/theme.svelte';
@@ -130,21 +131,11 @@
 		<aside class="m3-sidebar-ad">
 			<div class="m3-sidebar-ad-inner">
 				<!-- Vertical sidebar ad (first-screen, instant load) -->
-				<ins class="adsbygoogle ads-firstscreen"
-					style="display:inline-block;width:190px;height:570px"
-					data-ad-client="ca-pub-3758644447684310"
-					data-ad-slot="4497590737"></ins>
-				{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+				{@html adSidebar()}
 
 				<!-- Second auto-responsive ad -->
 				<div style="margin-top:24px">
-					<ins class="adsbygoogle"
-						style="display:block"
-						data-ad-client="ca-pub-3758644447684310"
-						data-ad-slot="4095096984"
-						data-ad-format="auto"
-						data-full-width-responsive="true"></ins>
-					{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+					{@html adAuto()}
 				</div>
 			</div>
 		</aside>

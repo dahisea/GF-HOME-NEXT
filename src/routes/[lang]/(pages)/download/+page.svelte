@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t } from '$i18n';
 	import { siteConfig, shouldShowAds, getDownloadDomains } from '$lib/config';
+	import { adAuto, adFluid, adSidebar, adAutorelaxed } from '$config/ads';
 
 	let { data } = $props<{ data: { lang: string; showAds: boolean } }>();
 	let lang = data.lang;
@@ -224,12 +225,10 @@
 <section class="download-page">
 	{#if shouldShowAds(lang)}
 		<div class="content-wrapper" style="margin-bottom:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+			{@html adAuto()}
 		</div>
 		<div class="content-wrapper" style="margin-bottom:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+			{@html adFluid()}
 		</div>
 	{/if}
 
@@ -247,8 +246,7 @@
 						: '使用方式: 在URL后加上 #/your-script-path.user.js'}
 				</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:16px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin-top:16px">{@html adAuto()}</div>
 				{/if}
 			{/if}
 
@@ -259,8 +257,7 @@
 				<p class="dl-desc">{progressText}</p>
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin-top:20px">{@html adAuto()}</div>
 				{/if}
 			{/if}
 
@@ -281,8 +278,7 @@
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin-top:20px">{@html adFluid()}</div>
 				{/if}
 			{/if}
 
@@ -308,8 +304,7 @@
 				</div>
 				<div class="dl-tip">提示: 正在随机测试 {selectedDomains.length} 个节点</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin-top:20px">{@html adAuto()}</div>
 				{/if}
 				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
 			{/if}
@@ -324,8 +319,7 @@
 				{/if}
 				<div class="dl-url">{finalUrl}</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin:12px 0">{@html adAuto()}</div>
 				{/if}
 				{#if testResults.length > 0}
 					<div class="dl-st">
@@ -350,8 +344,7 @@
 				<p class="dl-desc">{errorMsg || '所有节点检测超时, 已随机选择一个节点'}</p>
 				<div class="dl-url">{finalUrl}</div>
 				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0"><ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}</div>
+					<div style="margin:12px 0">{@html adAuto()}</div>
 				{/if}
 				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
 				<div class="dl-tip">若无法访问, 请重新整理再试</div>
@@ -361,16 +354,13 @@
 
 	{#if shouldShowAds(lang)}
 		<div class="content-wrapper" style="margin-top:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+			{@html adAutorelaxed()}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="fluid" data-ad-layout-key="-gy+2i+5x-ek+82"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+			{@html adFluid()}
 		</div>
 		<div class="content-wrapper" style="margin-top:16px">
-			<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-{@html `<script>(adsbygoogle = window.adsbygoogle || []).push({});<\/script>`}
+			{@html adAuto()}
 		</div>
 	{/if}
 </section>
