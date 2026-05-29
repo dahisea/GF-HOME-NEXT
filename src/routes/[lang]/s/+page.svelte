@@ -120,7 +120,6 @@
 		min-height: 100vh;
 		padding: 20px;
 		background: var(--md-sys-color-surface);
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 	}
 	.keywords-bg {
 		position: fixed;

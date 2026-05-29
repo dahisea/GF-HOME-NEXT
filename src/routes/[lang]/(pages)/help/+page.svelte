@@ -112,7 +112,6 @@
 
 <style>
 	.hp-page {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 		padding: 40px 0;
 		color: var(--md-sys-color-on-surface);
 	}

@@ -644,7 +644,6 @@
 
 <style>
 	.info-page-root {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 		background: var(--md-sys-color-surface);
 		min-height: 100vh;
 		color: var(--md-sys-color-on-surface);

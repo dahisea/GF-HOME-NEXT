@@ -274,7 +274,6 @@
 
 <style>
 	.sr-page {
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
 		color: var(--md-sys-color-on-surface);
 	}
 
