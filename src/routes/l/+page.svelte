@@ -53,6 +53,7 @@
 </script>
 
 <svelte:head>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
 	<script async src="https://pagead2.googlesyndication-cn.com/pagead/js/adsbygoogle.js?client=ca-pub-3758644447684310" crossorigin="anonymous"></script>
 	<title>Redirecting - ZGF</title>
 </svelte:head>
@@ -76,9 +77,7 @@
 	<div class="card">
 		<div class="card-glow"></div>
 		<div class="card-content">
-			<div class="logo-row">
-				<span class="logo-text">ZGF</span>
-			</div>
+			<span class="spin-icon material-icons">refresh</span>
 			<p id="redirect-countdown-text" class="countdown">Redirecting in {delaySec}s...</p>
 			<div class="ads-container">
 				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
@@ -104,8 +103,6 @@
 		justify-content: center;
 		min-height: 100vh;
 		padding: 20px;
-		background: linear-gradient(135deg, #1a0a00 0%, #2d1200 25%, #4a1e00 50%, #3a1600 75%, #1a0a00 100%);
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 		overflow: hidden;
 	}
 	.keywords-bg {
