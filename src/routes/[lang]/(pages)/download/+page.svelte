@@ -232,6 +232,29 @@
 		</div>
 	{/if}
 
+	<div class="content-wrapper">
+		<div class="md3-card" id="download-app" style="min-height:400px;box-shadow:var(--md-sys-elevation-2)">
+
+			<!-- no-path -->
+			{#if stage === 'no-path'}
+				<div class="dl-icon"><span class="material-icons">link</span></div>
+				<h1>{t(lang, 'download.title')}</h1>
+				<p class="dl-desc">{errorMsg}</p>
+				<div class="dl-tip">
+					{DLC.useQueryString
+						? '使用方式: 在URL后加上 ?path=your-script-path.user.js'
+						: '使用方式: 在URL后加上 #/your-script-path.user.js'}
+				</div>
+			{/if}
+
+			<!-- fetching-ip -->
+			{#if stage === 'fetching-ip'}
+				<div class="dl-icon"><span class="material-icons">sync</span></div>
+				<h1>{t(lang, 'download.title')}</h1>
+				<p class="dl-desc">{progressText}</p>
+				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
+			{/if}
+
 	<!-- checking-cache / init -->
 			{#if stage === 'checking-cache' || stage === 'init'}
 				<div class="dl-icon"><span class="material-icons">{stage === 'checking-cache' ? 'verified' : 'sync'}</span></div>
