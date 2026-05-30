@@ -231,6 +231,7 @@
 
 		const result = await raceNodes(allNodes, signal);
 		if (result.success && result.data) {
+			abortController.abort();
 			responseNode = result.node ? nodeName(result.node) : '';
 			handleResults(result.data);
 			return;
@@ -243,6 +244,7 @@
 			const randomNode = allNodes[Math.floor(Math.random() * allNodes.length)];
 			const retryResult = await fetchFromNode(randomNode, signal);
 			if (retryResult.success && retryResult.data) {
+				abortController.abort();
 				responseNode = nodeName(retryResult.node!);
 				handleResults(retryResult.data);
 				return;
@@ -601,6 +603,10 @@
 
 			<!-- Main content -->
 			<div class="lk-main">
+				{#if shouldShowAds(lang)}
+					<div style="margin-bottom:16px">{@html adAuto()}</div>
+					<div style="margin-bottom:16px">{@html adFluid()}</div>
+				{/if}
 				{#if loading}
 					<div class="md3-card lk-center-box">
 						<span class="material-icons lk-spinner">autorenew</span>
@@ -622,10 +628,6 @@
 						<p style="color:var(--md-sys-color-on-surface-variant)">{t(lang, 'lookup.no_results')}</p>
 					</div>
 				{:else if results.length > 0}
-					{#if shouldShowAds(lang)}
-						<div style="margin-bottom:16px">{@html adAuto()}</div>
-						<div style="margin-bottom:16px">{@html adFluid()}</div>
-					{/if}
 					<ol class="lk-script-list">
 						{#each results as script, i (script.id)}
 							{#if i > 0 && i % 5 === 0 && shouldShowAds(lang)}

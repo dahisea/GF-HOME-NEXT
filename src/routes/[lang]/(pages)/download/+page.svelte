@@ -232,36 +232,7 @@
 		</div>
 	{/if}
 
-	<div class="content-wrapper">
-		<div class="md3-card" id="download-app" style="min-height:400px;box-shadow:var(--md-sys-elevation-2)">
-
-			<!-- no-path -->
-			{#if stage === 'no-path'}
-				<div class="dl-icon"><span class="material-icons">link</span></div>
-				<h1>{t(lang, 'download.title')}</h1>
-				<p class="dl-desc">{errorMsg}</p>
-				<div class="dl-tip">
-					{DLC.useQueryString
-						? '使用方式: 在URL后加上 ?path=your-script-path.user.js'
-						: '使用方式: 在URL后加上 #/your-script-path.user.js'}
-				</div>
-				{#if shouldShowAds(lang)}
-					<div style="margin-top:16px">{@html adAuto()}</div>
-				{/if}
-			{/if}
-
-			<!-- fetching-ip -->
-			{#if stage === 'fetching-ip'}
-				<div class="dl-icon"><span class="material-icons">sync</span></div>
-				<h1>{t(lang, 'download.title')}</h1>
-				<p class="dl-desc">{progressText}</p>
-				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
-				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px">{@html adAuto()}</div>
-				{/if}
-			{/if}
-
-			<!-- checking-cache / init -->
+	<!-- checking-cache / init -->
 			{#if stage === 'checking-cache' || stage === 'init'}
 				<div class="dl-icon"><span class="material-icons">{stage === 'checking-cache' ? 'verified' : 'sync'}</span></div>
 				<h1>{stage === 'checking-cache' ? '校验中' : t(lang, 'download.title')}</h1>
@@ -276,13 +247,10 @@
 					</div>
 					<div class="dl-tip">提示: 缓存有效期 {DLC.cacheDays} 天{#if userIP} (IP: {userIP}){/if}</div>
 				{/if}
-				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
-				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px">{@html adFluid()}</div>
-				{/if}
-			{/if}
+			<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
+		{/if}
 
-			<!-- testing -->
+		<!-- testing -->
 			{#if stage === 'testing'}
 				<div class="dl-icon"><span class="material-icons">speed</span></div>
 				<h1>{t(lang, 'download.testing')}</h1>
@@ -302,12 +270,9 @@
 						</div>
 					{/each}
 				</div>
-				<div class="dl-tip">提示: 正在随机测试 {selectedDomains.length} 个节点</div>
-				{#if shouldShowAds(lang)}
-					<div style="margin-top:20px">{@html adAuto()}</div>
-				{/if}
-				<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
-			{/if}
+		<div class="dl-tip">提示: 正在随机测试 {selectedDomains.length} 个节点</div>
+		<div class="dl-progress-bar"><div class="dl-progress-fill" style="width:{progress}%"></div></div>
+	{/if}
 
 			<!-- success -->
 			{#if stage === 'success'}
@@ -317,42 +282,17 @@
 				{#if !cacheHit}
 					<div class="dl-badge"><span class="material-icons">speed</span>最低延迟 {bestLatency.toFixed(0)}ms</div>
 				{/if}
-				<div class="dl-url">{finalUrl}</div>
-				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0">{@html adAuto()}</div>
-				{/if}
-				{#if testResults.length > 0}
-					<div class="dl-st">
-						<div class="dl-st-t">测速结果</div>
-						{#each testResults as r, i}
-							<div class="dl-st-i ok">
-								<span class="material-icons">{i === 0 ? 'emoji_events' : 'check_circle'}</span>
-								{formatDomain(r.domain)}
-								<span class="lat">{r.latency.toFixed(0)}ms</span>
-							</div>
-						{/each}
-					</div>
-				{/if}
-				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
-				<div class="dl-progress-bar"><div class="dl-progress-fill ok" style="width:100%"></div></div>
-			{/if}
-
-			<!-- fallback -->
-			{#if stage === 'fallback'}
-				<div class="dl-icon"><span class="material-icons err">warning</span></div>
-				<h1>{t(lang, 'download.error')}</h1>
-				<p class="dl-desc">{errorMsg || '所有节点检测超时, 已随机选择一个节点'}</p>
-				<div class="dl-url">{finalUrl}</div>
-				{#if shouldShowAds(lang)}
-					<div style="margin:12px 0">{@html adAuto()}</div>
-				{/if}
-				<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
-				<div class="dl-tip">若无法访问, 请重新整理再试</div>
+		<div class="dl-url">{finalUrl}</div>
+		<a href={finalUrl} class="dl-btn" target="_blank" rel="noopener noreferrer"><span class="material-icons">open_in_new</span>{t(lang, 'download.manual')}</a>
+		<div class="dl-tip">若无法访问, 请重新整理再试</div>
 			{/if}
 		</div>
 	</div>
 
 	{#if shouldShowAds(lang)}
+		<div class="content-wrapper" style="margin-top:16px">
+			{@html adAuto()}
+		</div>
 		<div class="content-wrapper" style="margin-top:16px">
 			{@html adAutorelaxed()}
 		</div>

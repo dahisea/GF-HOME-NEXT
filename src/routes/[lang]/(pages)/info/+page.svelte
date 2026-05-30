@@ -610,6 +610,9 @@
 					{/if}
 				{:else}
 					<!-- Feedback Tab -->
+					{#if shouldShowAds(lang)}
+						<div style="margin-bottom:16px">{@html adAuto()}</div>
+					{/if}
 					{#if feedbackListHtml}
 						<div class="if-content-area if-gf-feedback" id="feedback-list" use:processLinks={gfLocale}>{@html feedbackListHtml}</div>
 					{#if feedbackTotalPages > 1}

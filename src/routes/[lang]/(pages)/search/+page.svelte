@@ -159,7 +159,14 @@
 					</svg>
 				</button>
 			</div>
-		</form>
+	</form>
+
+		<!-- Below Search Form Ad -->
+		{#if shouldShowAds(lang)}
+			<div style="margin:16px 0">
+				{@html adAuto()}
+			</div>
+		{/if}
 
 		<!-- Mid Ad (fluid in-feed) -->
 		{#if shouldShowAds(lang)}
