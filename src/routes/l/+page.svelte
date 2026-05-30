@@ -158,7 +158,7 @@
 	}
 	.kw-block span {
 		font-size: 12px; color: var(--md-sys-color-on-surface-variant);
-		opacity: 0.5; font-weight: 400; letter-spacing: 0.3px;
+		opacity: 0; font-weight: 400; letter-spacing: 0.3px;
 	}
 	.skip { margin: 20px 0 8px; text-align: center; }
 	.skip :global(button) {
