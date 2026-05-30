@@ -12,7 +12,7 @@ export const prerender = true;
 
 export const load: LayoutServerLoad = ({ url, params }) => {
 	const lang = (params.lang as Lang) || i18nConfig.defaultLang;
-	const origin = url.origin;
+	const origin = siteConfig.url;
 	const pathname = url.pathname;
 
 	const pageTitle = siteConfig.name;

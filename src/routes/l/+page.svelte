@@ -1,6 +1,7 @@
 ﻿<script lang="ts">
 	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
+	import { adAuto, adAutorelaxed } from '$config/ads';
 
 	let delaySec = siteConfig.redirects.downloadDelaySec;
 
@@ -38,13 +39,6 @@
 		textEl.textContent = 'Redirecting in ' + countdown + 's...';
 		const interval = setInterval(tick, 1000);
 
-		try {
-			const w = window as unknown as Record<string, unknown>;
-			const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
-			if (!w.adsbygoogle) w.adsbygoogle = q;
-			q.push({}); q.push({}); q.push({});
-		} catch (e) { /* ad blocked */ }
-
 		return () => {
 			clearInterval(interval);
 			window.removeEventListener('hashchange', update);
@@ -79,14 +73,25 @@
 		<div class="card-content">
 			<span class="spin-icon material-icons">refresh</span>
 			<p id="redirect-countdown-text" class="countdown">Redirecting in {delaySec}s...</p>
-			<div class="ads-container">
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4497590737" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+			<div class="ad-slot">{@html adAuto()}</div>
+
+			<div class="kw-block">
+				<span>CDN加速</span><span>代理服务器</span><span>智能路由</span><span>全球加速</span><span>边缘节点</span><span>跨境网络</span><span>负载均衡</span><span>反向代理</span>
 			</div>
+
+			<div class="ad-slot">{@html adAutorelaxed()}</div>
+
+			<div class="kw-block">
+				<span>Shadowsocks</span><span>V2Ray</span><span>Trojan</span><span>WireGuard</span><span>SOCKS5</span><span>HTTP代理</span><span>VPN隧道</span><span>隧道协议</span>
+			</div>
+
+			<div class="ad-slot">{@html adAuto()}</div>
+
+			<div class="kw-block">
+				<span>智能DNS</span><span>流量调度</span><span>零信任</span><span>端到端加密</span><span>传输优化</span><span>链路聚合</span><span>边缘计算</span><span>内容分发</span>
+			</div>
+
 			<p id="redirect-skip" class="skip">
 				<button onclick={() => location.reload()}>Click here if not redirected</button>
 			</p>
@@ -103,7 +108,7 @@
 		justify-content: center;
 		min-height: 100vh;
 		padding: 20px;
-		overflow: hidden;
+		background: var(--md-sys-color-surface);
 	}
 	.keywords-bg {
 		position: fixed;
@@ -118,96 +123,50 @@
 		align-content: center;
 		justify-content: center;
 	}
-	.kw-col {
-		display: flex;
-		flex-direction: column;
-		gap: 14px;
-		min-width: 140px;
-		flex: 1;
-		max-width: 220px;
-	}
-	.kw-col span {
-		color: #ff9466;
-		font-size: 13px;
-		font-weight: 500;
-		opacity: 0.04;
-		letter-spacing: 0.5px;
-		white-space: nowrap;
-		text-align: center;
-	}
+	.kw-col { display: flex; flex-direction: column; gap: 14px; min-width: 140px; flex: 1; max-width: 220px; }
+	.kw-col span { color: var(--md-sys-color-primary); font-size: 13px; font-weight: 500; opacity: 0.04; letter-spacing: 0.5px; white-space: nowrap; text-align: center; }
 	.card {
-		position: relative;
-		z-index: 1;
-		width: 100%;
-		max-width: 460px;
-		background: rgba(255, 255, 255, 0.03);
+		position: relative; z-index: 1; width: 100%; max-width: 460px;
+		background: var(--glass-bg);
 		backdrop-filter: blur(20px);
 		-webkit-backdrop-filter: blur(20px);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		border-radius: 20px;
-		overflow: hidden;
+		border: 1px solid var(--glass-border);
+		border-radius: 20px; overflow: hidden;
 	}
 	.card-glow {
-		position: absolute;
-		inset: 0;
-		background: radial-gradient(ellipse at 50% 0%, rgba(127, 51, 0, 0.15) 0%, transparent 70%);
-		pointer-events: none;
+		position: absolute; inset: 0;
+		background: radial-gradient(ellipse at 50% 0%, var(--md-sys-color-primary-container) 0%, transparent 70%);
+		pointer-events: none; opacity: 0.15;
 	}
-	.card-content {
-		position: relative;
-		padding: 32px 28px 24px;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-	.logo-row {
+	.card-content { position: relative; padding: 40px 28px 24px; display: flex; flex-direction: column; align-items: center; }
+	.spin-icon {
+		font-size: 48px; color: var(--md-sys-color-primary);
+		animation: spin 1s linear infinite;
 		margin-bottom: 20px;
 	}
-	.logo-text {
-		font-size: 32px;
-		font-weight: 700;
-		letter-spacing: 4px;
-		background: linear-gradient(135deg, #ff8a50 0%, #ff6b2b 50%, #e85d1a 100%);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
+	@keyframes spin { from { transform: rotate(0deg) } to { transform: rotate(360deg) } }
 	.countdown {
-		font-size: 15px;
-		color: rgba(255, 255, 255, 0.6);
-		margin: 0 0 20px;
-		text-align: center;
-		font-weight: 400;
-		letter-spacing: 0.3px;
+		font-size: 16px; color: var(--md-sys-color-on-surface-variant); margin: 0 0 20px;
+		text-align: center; font-weight: 400; letter-spacing: 0.3px;
 	}
-	.ads-container {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-		margin-bottom: 8px;
+	.ad-slot {
+		width: 100%; margin: 8px 0;
 	}
-	.skip {
-		margin: 20px 0 8px;
-		text-align: center;
+	.kw-block {
+		display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px;
+		margin: 12px 0; padding: 8px 0; user-select: none;
 	}
+	.kw-block span {
+		font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+		opacity: 0.5; font-weight: 400; letter-spacing: 0.3px;
+	}
+	.skip { margin: 20px 0 8px; text-align: center; }
 	.skip :global(button) {
-		display: inline-block;
-		padding: 12px 36px;
-		background: linear-gradient(135deg, #8a3700 0%, #7f3300 100%);
-		color: #fff;
-		border: 1px solid rgba(255, 255, 255, 0.1);
-		border-radius: 999px;
-		font-size: 14px;
-		font-weight: 500;
-		cursor: pointer;
-		letter-spacing: 0.3px;
-		transition: all 0.2s ease;
-		box-shadow: 0 4px 20px rgba(127, 51, 0, 0.3);
+		display: inline-block; padding: 12px 36px;
+		background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary);
+		border: none; border-radius: 999px; font-size: 14px; font-weight: 500;
+		cursor: pointer; letter-spacing: 0.3px; transition: all 0.2s ease;
+		box-shadow: 0 4px 20px rgba(127,51,0,0.25);
 	}
-	.skip :global(button:hover) {
-		background: linear-gradient(135deg, #a34400 0%, #943c00 100%);
-		box-shadow: 0 6px 28px rgba(127, 51, 0, 0.45);
-		transform: translateY(-1px);
-	}
+	.skip :global(button:hover) { filter: brightness(1.15); box-shadow: 0 6px 28px rgba(127,51,0,0.35); transform: translateY(-1px); }
 </style>

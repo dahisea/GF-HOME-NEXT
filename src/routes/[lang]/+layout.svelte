@@ -113,6 +113,10 @@
 <Nav {lang} />
 {/if}
 
+{#if showAds && !hideChrome}
+<div class="m3-nav-ad">{@html adAutorelaxed()}</div>
+{/if}
+
 <!-- GTM noscript fallback (before any visible content) -->
 {#if showAds && gtmId && !hideChrome}
 	<noscript>
@@ -133,6 +137,13 @@
 {/if}
 
 <style>
+	.m3-nav-ad {
+		max-width: 1160px;
+		margin: 0 auto;
+		padding: 12px var(--md-sys-layout-side-margin, 16px) 0;
+		text-align: center;
+	}
+
 	.m3-layout-body {
 		max-width: 1160px;
 		margin: 0 auto;

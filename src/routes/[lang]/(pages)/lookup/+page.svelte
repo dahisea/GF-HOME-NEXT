@@ -622,6 +622,10 @@
 						<p style="color:var(--md-sys-color-on-surface-variant)">{t(lang, 'lookup.no_results')}</p>
 					</div>
 				{:else if results.length > 0}
+					{#if shouldShowAds(lang)}
+						<div style="margin-bottom:16px">{@html adAuto()}</div>
+						<div style="margin-bottom:16px">{@html adFluid()}</div>
+					{/if}
 					<ol class="lk-script-list">
 						{#each results as script, i (script.id)}
 							{#if i > 0 && i % 5 === 0 && shouldShowAds(lang)}

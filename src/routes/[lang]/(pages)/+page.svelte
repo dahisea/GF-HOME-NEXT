@@ -65,7 +65,7 @@
 	<!-- ═══ AD: Below search bar ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			{@html adAutorelaxed()}
+			{@html adFluid()}
 		</div>
 	{/if}
 
@@ -78,7 +78,7 @@
 	<!-- ═══ AD: After intro ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			{@html adFluid()}
+			{@html adAuto()}
 		</div>
 	{/if}
 
@@ -96,7 +96,7 @@
 	<!-- ═══ AD: After ScriptCat ═══ -->
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
-			{@html adFluid()}
+			{@html adAuto()}
 		</div>
 	{/if}
 
@@ -128,13 +128,6 @@
 	{#if shouldShowAds(lang)}
 		<div style="text-align:center;margin-bottom:24px">
 			{@html adAutorelaxed()}
-		</div>
-	{/if}
-
-	<!-- ═══ AD: auto fluid ═══ -->
-	{#if shouldShowAds(lang)}
-		<div style="text-align:center;margin-bottom:24px">
-			{@html adFluid()}
 		</div>
 	{/if}
 

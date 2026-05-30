@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { t, type Lang } from '$i18n';
 	import { siteConfig } from '$lib/config';
+	import { adAuto, adAutorelaxed } from '$config/ads';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
@@ -46,13 +47,6 @@
 		textEl.textContent = waitTemplate.replace('{countdown}', String(countdown));
 		const interval = setInterval(tick, 1000);
 
-		try {
-			const w = window as unknown as Record<string, unknown>;
-			const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
-			if (!w.adsbygoogle) w.adsbygoogle = q;
-			q.push({}); q.push({}); q.push({});
-		} catch (e) { /* ad blocked */ }
-
 		return () => {
 			clearInterval(interval);
 			window.removeEventListener('hashchange', update);
@@ -87,14 +81,25 @@
 		<div class="card-content">
 			<span class="spin-icon material-icons">refresh</span>
 			<p id="redirect-countdown-text" class="countdown">{waitTemplate.replace('{countdown}', String(delaySec))}</p>
-			<div class="ads-container">
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="3934604756" data-ad-format="autorelaxed"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="1394739154" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4497590737" data-ad-format="auto" data-full-width-responsive="true"></ins>
-				<ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-3758644447684310" data-ad-slot="4095096984" data-ad-format="auto" data-full-width-responsive="true"></ins>
+
+			<div class="ad-slot">{@html adAuto()}</div>
+
+			<div class="kw-block">
+				<span>CDN加速</span><span>代理服务器</span><span>智能路由</span><span>全球加速</span><span>边缘节点</span><span>跨境网络</span><span>负载均衡</span><span>反向代理</span>
 			</div>
+
+			<div class="ad-slot">{@html adAutorelaxed()}</div>
+
+			<div class="kw-block">
+				<span>Shadowsocks</span><span>V2Ray</span><span>Trojan</span><span>WireGuard</span><span>SOCKS5</span><span>HTTP代理</span><span>VPN隧道</span><span>隧道协议</span>
+			</div>
+
+			<div class="ad-slot">{@html adAuto()}</div>
+
+			<div class="kw-block">
+				<span>智能DNS</span><span>流量调度</span><span>零信任</span><span>端到端加密</span><span>传输优化</span><span>链路聚合</span><span>边缘计算</span><span>内容分发</span>
+			</div>
+
 			<p id="redirect-skip" class="skip">
 				<button onclick={() => location.reload()}>{skipText}</button>
 			</p>
@@ -152,7 +157,17 @@
 		font-size: 16px; color: var(--md-sys-color-on-surface-variant); margin: 0 0 20px;
 		text-align: center; font-weight: 400; letter-spacing: 0.3px;
 	}
-	.ads-container { width: 100%; display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px; }
+	.ad-slot {
+		width: 100%; margin: 8px 0;
+	}
+	.kw-block {
+		display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px;
+		margin: 12px 0; padding: 8px 0; user-select: none;
+	}
+	.kw-block span {
+		font-size: 12px; color: var(--md-sys-color-on-surface-variant);
+		opacity: 0.5; font-weight: 400; letter-spacing: 0.3px;
+	}
 	.skip { margin: 20px 0 8px; text-align: center; }
 	.skip :global(button) {
 		display: inline-block; padding: 12px 36px;

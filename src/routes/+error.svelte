@@ -1,15 +1,6 @@
 ﻿<script lang="ts">
-	import { onMount } from 'svelte';
 	import { siteConfig } from '$lib/config';
-	import { adAuto, adFluid, adAutorelaxed } from '$config/ads';
-
-	onMount(() => {
-		const w = window as unknown as Record<string, unknown>;
-		const q = (w.adsbygoogle as Array<Record<string, unknown>>) || [];
-		if (!w.adsbygoogle) w.adsbygoogle = q;
-		q.push({});
-		q.push({});
-	});
+	import { adAuto, adAutorelaxed } from '$config/ads';
 </script>
 
 <svelte:head>

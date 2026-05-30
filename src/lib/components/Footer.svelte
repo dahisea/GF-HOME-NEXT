@@ -46,7 +46,7 @@
 		<!-- AdSense (only on ad-enabled locales) -->
 		{#if showAds}
 			<div class="m3-footer-ad">
-				{@html adAuto()}
+				{@html adFluid()}
 			</div>
 		{/if}
 

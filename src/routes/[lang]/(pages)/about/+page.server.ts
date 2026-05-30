@@ -7,7 +7,7 @@ export const prerender = true;
 
 export const load: PageServerLoad = ({ url, params }) => {
 	const lang = params.lang;
-	const origin = url.origin;
+	const origin = siteConfig.url;
 	const pathname = url.pathname;
 
 	return {
