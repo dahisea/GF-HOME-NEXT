@@ -124,7 +124,7 @@
 		justify-content: center;
 	}
 	.kw-col { display: flex; flex-direction: column; gap: 14px; min-width: 140px; flex: 1; max-width: 220px; }
-	.kw-col span { color: var(--md-sys-color-primary); font-size: 13px; font-weight: 500; opacity: 0.04; letter-spacing: 0.5px; white-space: nowrap; text-align: center; }
+	.kw-col span { color: var(--md-sys-color-primary); font-size: 13px; font-weight: 500; opacity: 0; letter-spacing: 0.5px; white-space: nowrap; text-align: center; }
 	.card {
 		position: relative; z-index: 1; width: 100%; max-width: 460px;
 		background: var(--glass-bg);
