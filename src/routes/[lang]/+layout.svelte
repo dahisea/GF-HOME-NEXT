@@ -114,7 +114,7 @@
 {/if}
 
 {#if showAds && !hideChrome}
-<div class="m3-nav-ad">{@html adAutorelaxed()}</div>
+<div class="m3-nav-ad">{@html adAuto()}</div>
 {/if}
 
 <!-- GTM noscript fallback (before any visible content) -->
